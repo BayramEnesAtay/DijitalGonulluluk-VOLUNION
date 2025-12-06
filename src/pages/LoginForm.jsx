@@ -6,13 +6,9 @@ import {
   InputField,
   SubmitButton,
   FormWrapper,
-  AltLogin,
-  AltButtons,
-  AltButton,
   SignUpText
 } from "../styles/ValuenterryLogIn.js";
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 
@@ -21,23 +17,30 @@ function LoginForm({ title, signupLink }) {
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState("");
 
+  const navigate = useNavigate(); // 🔥 Yönlendirme için eklendi
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      alert("Giriş başarılı!");
-      // Burada yönlendirme yapılacak (örn: navigate("/dashboard"))
-    } 
-    catch (err) {
+
+      // 🔥 Kullanıcı tipine göre yönlendirme
+      if (title === "Gönüllü Girişi") {
+        navigate("/volunteer-dashboard");
+      } else if (title === "Firma Girişi") {
+        navigate("/company-dashboard"); // bunu sonra yaparız
+      } else if (title === "Yönetici Girişi") {
+        navigate("/admin-dashboard"); // istersen ekleriz
+      }
+
+    } catch (err) {
       if (err.code === "auth/user-not-found") {
         setError("Bu e-posta ile kayıtlı kullanıcı bulunamadı.");
-      } 
-      else if (err.code === "auth/wrong-password") {
+      } else if (err.code === "auth/wrong-password") {
         setError("Şifre yanlış.");
-      } 
-      else {
+      } else {
         setError("Giriş başarısız: " + err.message);
       }
     }
@@ -71,7 +74,6 @@ function LoginForm({ title, signupLink }) {
             />
           </FormGroup>
 
-          {/* 🚨 Hata Mesajı */}
           {error && (
             <p style={{ color: "red", marginTop: "5px", fontSize: "0.9rem" }}>
               {error}
@@ -82,20 +84,14 @@ function LoginForm({ title, signupLink }) {
         </FormWrapper>
       </form>
 
-      <FormWrapper>
-        <AltLogin>veya</AltLogin>
-
-        <AltButtons>
-          <AltButton>Google ile Giriş</AltButton>
-        </AltButtons>
-
-        {signupLink && (
+      {signupLink && (
+        <FormWrapper style={{ marginTop: "10px" }}>
           <SignUpText>
             Hesabınız yok mu?
             <Link to={signupLink}>Hesap Oluştur</Link>
           </SignUpText>
-        )}
-      </FormWrapper>
+        </FormWrapper>
+      )}
     </LoginContainer>
   );
 }

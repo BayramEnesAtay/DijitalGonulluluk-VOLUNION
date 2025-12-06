@@ -5,6 +5,8 @@ import VolunteerSignUp from "./pages/ValunteerySignUp.jsx";
 import CompanyLogin from "./pages/CompanyLogIn.jsx";
 import CompanySignUp from "./pages/CompanySignUp.jsx";
 import AdminLogIn from "./pages/AdministratorLogIn.jsx";
+import VolunteerDashboard from "./pages/VolunteerDashboard.jsx";
+import CompanyDashboard from "./pages/CompanyDashboard.jsx";
 //import VolunteerSignUp from "./pages/ValunteerySignUp.jsx"; 
 
 function App() {
@@ -17,6 +19,8 @@ function App() {
         <Route path="/company-signup" element={<CompanySignUp />} />
         <Route path="/company-login" element={<CompanyLogin />} />
         <Route path="/admin-login" element={<AdminLogIn />} />
+        <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} />
+        <Route path="/company-dashboard" element={<CompanyDashboard />} />
       </Routes>
     </Router>
   );
