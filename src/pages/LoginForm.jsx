@@ -13,13 +13,34 @@ import {
 } from "../styles/ValuenterryLogIn.js";
 import { Link } from "react-router-dom";
 
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
+
 function LoginForm({ title, signupLink }) {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [error, setError] = React.useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(`${title}: ${email} / ${password}`);
+    setError("");
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      alert("Giriş başarılı!");
+      // Burada yönlendirme yapılacak (örn: navigate("/dashboard"))
+    } 
+    catch (err) {
+      if (err.code === "auth/user-not-found") {
+        setError("Bu e-posta ile kayıtlı kullanıcı bulunamadı.");
+      } 
+      else if (err.code === "auth/wrong-password") {
+        setError("Şifre yanlış.");
+      } 
+      else {
+        setError("Giriş başarısız: " + err.message);
+      }
+    }
   };
 
   return (
@@ -50,6 +71,13 @@ function LoginForm({ title, signupLink }) {
             />
           </FormGroup>
 
+          {/* 🚨 Hata Mesajı */}
+          {error && (
+            <p style={{ color: "red", marginTop: "5px", fontSize: "0.9rem" }}>
+              {error}
+            </p>
+          )}
+
           <SubmitButton type="submit">Giriş Yap</SubmitButton>
         </FormWrapper>
       </form>
@@ -61,7 +89,6 @@ function LoginForm({ title, signupLink }) {
           <AltButton>Google ile Giriş</AltButton>
         </AltButtons>
 
-        {/* signupLink varsa göster */}
         {signupLink && (
           <SignUpText>
             Hesabınız yok mu?

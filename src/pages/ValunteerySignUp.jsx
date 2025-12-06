@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
 import {
   SignUpContainer,
   SignUpHeading,
@@ -52,18 +54,29 @@ const handleNext = () => {
 
 
   /* 🔥 2. aşama validasyon */
-  const handleSubmit = () => {
-    let newErrors = {};
+  const handleSubmit = async () => {
+  let newErrors = {};
 
-    if (!form2.password) newErrors.password = "Bu alan boş bırakılamaz";
+  if (!form1.email) newErrors.email = "Bu alan boş bırakılamaz";
+  if (!form2.password) newErrors.password = "Bu alan boş bırakılamaz";
 
-    setErrors2(newErrors);
+  setErrors2(newErrors);
 
-    if (Object.keys(newErrors).length === 0) {
-      alert("Kayıt başarılı!");
-      // Firebase register burada yapılacak
-    }
-  };
+  if (Object.keys(newErrors).length !== 0) return;
+
+  try {
+    const user = await createUserWithEmailAndPassword(auth, form1.email, form2.password);
+
+    alert("🎉 Kayıt Başarılı!");
+
+    console.log("Kullanıcı:", user.user);
+
+  } catch (error) {
+    alert(error.message);
+    console.log(error);
+  }
+};
+
 
   return (
     <SignUpContainer>

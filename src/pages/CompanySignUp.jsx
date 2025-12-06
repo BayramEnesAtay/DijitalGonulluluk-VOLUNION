@@ -12,6 +12,9 @@ import {
   LoginRedirect
 } from "../styles/CompanySignUpStyles.js";
 
+import { auth } from "../firebase.js";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+
 // ------------------ 81 İL LİSTESİ ------------------
 const cities = [
   "Adana","Adıyaman","Afyonkarahisar","Ağrı","Aksaray","Amasya","Ankara","Antalya",
@@ -64,7 +67,6 @@ function CompanySignUp() {
     fullname: "",
     email: "",
     phone: "",
-    username: "",
     password: "",
   });
 
@@ -81,9 +83,24 @@ function CompanySignUp() {
   // ---------------- HANDLERS ----------------
   const handleNext1 = () => { if (validateStep(form1)) setStep(2); };
   const handleNext2 = () => { if (validateStep(form2)) setStep(3); };
-  const handleSubmit = () => {
+
+  const handleSubmit = async () => {
     if (!validateStep(form3)) return;
-    alert("🎉 Firma kaydı başarıyla oluşturuldu!");
+
+    try {
+      await createUserWithEmailAndPassword(auth, form3.email, form3.password);
+
+      alert("🎉 Firma kaydı başarıyla oluşturuldu!");
+
+    } catch (err) {
+      if (err.code === "auth/email-already-in-use") {
+        setErrors({ email: "Bu email zaten kayıtlı!" });
+      } else if (err.code === "auth/weak-password") {
+        setErrors({ password: "Parola en az 6 karakter olmalıdır." });
+      } else {
+        alert("Hata: " + err.message);
+      }
+    }
   };
 
   return (
@@ -153,11 +170,11 @@ function CompanySignUp() {
           </FormGroup>
 
           <ActionButton onClick={handleNext1}>Devam Et</ActionButton>
+
           <LoginRedirect>
             Hesabınız var mı?
             <Link to="/company-login">Giriş Yap</Link>
           </LoginRedirect>
-
         </FormWrapper>
       )}
 
@@ -197,6 +214,7 @@ function CompanySignUp() {
           </FormGroup>
 
           <ActionButton onClick={handleNext2}>Devam Et</ActionButton>
+
           <LoginRedirect>
             Hesabınız var mı?
             <Link to="/company-login">Giriş Yap</Link>
@@ -233,7 +251,7 @@ function CompanySignUp() {
             />
             {errors.email && <ErrorText>{errors.email}</ErrorText>}
           </FormGroup>
-          
+
           <FormGroup>
             <label>Parola</label>
             <InputField
@@ -245,6 +263,7 @@ function CompanySignUp() {
           </FormGroup>
 
           <ActionButton onClick={handleSubmit}>Hesap Oluştur</ActionButton>
+
           <LoginRedirect>
             Hesabınız var mı?
             <Link to="/company-login">Giriş Yap</Link>
