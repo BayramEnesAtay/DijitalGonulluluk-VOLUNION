@@ -2,6 +2,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/FirstPage.jsx";
 import VolunteerLogin from "./pages/ValunteeryLogIn.jsx";
 import VolunteerSignUp from "./pages/ValunteerySignUp.jsx";
+import CompanyLogin from "./pages/CompanyLogIn.jsx";
+import CompanySignUp from "./pages/CompanySignUp.jsx";
+import AdminLogIn from "./pages/AdministratorLogIn.jsx";
 //import VolunteerSignUp from "./pages/ValunteerySignUp.jsx"; 
 
 function App() {
@@ -11,6 +14,9 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/volunteer-login" element={<VolunteerLogin />} />
         <Route path="/volunteer-signup" element={<VolunteerSignUp />} />
+        <Route path="/company-signup" element={<CompanySignUp />} />
+        <Route path="/company-login" element={<CompanyLogin />} />
+        <Route path="/admin-login" element={<AdminLogIn />} />
       </Routes>
     </Router>
   );

@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   PageWrapper,
   Heading,
@@ -9,11 +10,6 @@ import {
 } from "../styles/FirstPage.js";
 
 function LandingPage() {
-
-  const handleNonVolunteer = (type) => {
-    alert(`${type} girişi tıklandı!`);
-  };
-
   return (
     <PageWrapper>
       <Heading>Hoşgeldiniz!</Heading>
@@ -52,8 +48,8 @@ function LandingPage() {
           <OptionLabel>Gönüllü Girişi</OptionLabel>
         </OptionCard>
 
-        {/* FİRMA */}
-        <OptionCard as="button" onClick={() => handleNonVolunteer("Firma")}>
+        {/* FİRMA GİRİŞİ */}
+        <OptionCard to="/company-login">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="72"
@@ -80,7 +76,7 @@ function LandingPage() {
         </OptionCard>
 
         {/* YÖNETİCİ */}
-        <OptionCard as="button" onClick={() => handleNonVolunteer("Yönetici")}>
+        <OptionCard to="/admin-login">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="72"
