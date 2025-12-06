@@ -14,12 +14,12 @@ import {
 import { Link } from "react-router-dom";
 
 function LoginForm({ title, signupLink }) {
-  const [username, setUsername] = React.useState("");
+  const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert(`${title}: ${username} / ${password}`);
+    alert(`${title}: ${email} / ${password}`);
   };
 
   return (
@@ -29,12 +29,12 @@ function LoginForm({ title, signupLink }) {
       <form onSubmit={handleSubmit}>
         <FormWrapper>
           <FormGroup>
-            <label>Kullanıcı Adı</label>
+            <label>E-Mail</label>
             <InputField
-              type="text"
-              placeholder="Kullanıcı adınızı giriniz"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              placeholder="E-posta adresinizi giriniz"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </FormGroup>
@@ -61,7 +61,7 @@ function LoginForm({ title, signupLink }) {
           <AltButton>Google ile Giriş</AltButton>
         </AltButtons>
 
-        {/* 🔥 signupLink varsa göster, yoksa hiç render etme */}
+        {/* signupLink varsa göster */}
         {signupLink && (
           <SignUpText>
             Hesabınız yok mu?

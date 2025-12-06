@@ -24,48 +24,54 @@ function VolunteerSignup() {
 
   const [errors1, setErrors1] = useState({});
 
-  // 2. aşama verileri
+  // 2. aşama verileri → sadece şifre
   const [form2, setForm2] = useState({
-    username: "",
     password: ""
   });
 
   const [errors2, setErrors2] = useState({});
 
   /* 🔥 1. aşama validasyon */
-  const handleNext = () => {
-    let newErrors = {};
+/* 🔥 1. aşama validasyon */
+const handleNext = () => {
+  let newErrors = {};
 
-    if (!form1.fullname) newErrors.fullname = "Bu alan boş bırakılamaz";
-    if (!form1.tc) newErrors.tc = "Bu alan boş bırakılamaz";
-    if (!form1.phone) newErrors.phone = "Bu alan boş bırakılamaz";
-    if (!form1.email) newErrors.email = "Bu alan boş bırakılamaz";
+  if (!form1.fullname) newErrors.fullname = "Bu alan boş bırakılamaz";
+  if (!form1.tc) newErrors.tc = "Bu alan boş bırakılamaz";
+  if (!form1.phone) newErrors.phone = "Bu alan boş bırakılamaz";
 
-    setErrors1(newErrors);
+  // ❌ Email artık burada kontrol edilmiyor
+  // if (!form1.email) newErrors.email = "Boş bırakılmaz";
 
-    if (Object.keys(newErrors).length === 0) {
-      setStep(2);
-    }
-  };
+  setErrors1(newErrors);
+
+  if (Object.keys(newErrors).length === 0) {
+    setStep(2);
+  }
+};
+
 
   /* 🔥 2. aşama validasyon */
   const handleSubmit = () => {
     let newErrors = {};
 
-    if (!form2.username) newErrors.username = "Bu alan boş bırakılamaz";
     if (!form2.password) newErrors.password = "Bu alan boş bırakılamaz";
 
     setErrors2(newErrors);
 
+    if (Object.keys(newErrors).length === 0) {
+      alert("Kayıt başarılı!");
+      // Firebase register burada yapılacak
+    }
   };
 
   return (
     <SignUpContainer>
       <SignUpHeading>Gönüllü Kayıt</SignUpHeading>
 
+      {/* ------------------ 1. AŞAMA ------------------ */}
       {step === 1 && (
         <FormWrapper>
-          {/* Ad Soyad */}
           <FormGroup>
             <label>Ad Soyad</label>
             <InputField
@@ -77,7 +83,6 @@ function VolunteerSignup() {
             {errors1.fullname && <ErrorText>{errors1.fullname}</ErrorText>}
           </FormGroup>
 
-          {/* TC */}
           <FormGroup>
             <label>TC Kimlik No</label>
             <InputField
@@ -89,7 +94,6 @@ function VolunteerSignup() {
             {errors1.tc && <ErrorText>{errors1.tc}</ErrorText>}
           </FormGroup>
 
-          {/* Telefon */}
           <FormGroup>
             <label>Telefon Numarası</label>
             <InputField
@@ -101,7 +105,13 @@ function VolunteerSignup() {
             {errors1.phone && <ErrorText>{errors1.phone}</ErrorText>}
           </FormGroup>
 
-          {/* Email */}
+          <ActionButton onClick={handleNext}>Devam Et</ActionButton>
+        </FormWrapper>
+      )}
+
+      {/* ------------------ 2. AŞAMA ------------------ */}
+      {step === 2 && (
+        <FormWrapper>
           <FormGroup>
             <label>E-Mail</label>
             <InputField
@@ -112,26 +122,6 @@ function VolunteerSignup() {
             />
             {errors1.email && <ErrorText>{errors1.email}</ErrorText>}
           </FormGroup>
-
-          <ActionButton onClick={handleNext}>Devam Et</ActionButton>
-        </FormWrapper>
-      )}
-
-      {step === 2 && (
-        <FormWrapper>
-          {/* Kullanıcı Adı */}
-          <FormGroup>
-            <label>Kullanıcı Adı</label>
-            <InputField
-              type="text"
-              placeholder="Kullanıcı adı seçiniz"
-              value={form2.username}
-              onChange={(e) => setForm2({ ...form2, username: e.target.value })}
-            />
-            {errors2.username && <ErrorText>{errors2.username}</ErrorText>}
-          </FormGroup>
-
-          {/* Şifre */}
           <FormGroup>
             <label>Şifre</label>
             <InputField
@@ -148,6 +138,8 @@ function VolunteerSignup() {
           <ActionButton onClick={handleSubmit}>Hesap Oluştur</ActionButton>
         </FormWrapper>
       )}
+
+      {/* Giriş linki */}
       <SignInText>
         Hesabınız var mı?
         <Link to="/volunteer-login">Giriş Yap</Link>

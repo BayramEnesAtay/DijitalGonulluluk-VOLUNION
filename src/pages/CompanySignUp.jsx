@@ -233,16 +233,7 @@ function CompanySignUp() {
             />
             {errors.email && <ErrorText>{errors.email}</ErrorText>}
           </FormGroup>
-
-          <FormGroup>
-            <label>Kullanıcı Adı</label>
-            <InputField
-              value={form3.username}
-              onChange={(e) => setForm3({ ...form3, username: e.target.value })}
-            />
-            {errors.username && <ErrorText>{errors.username}</ErrorText>}
-          </FormGroup>
-
+          
           <FormGroup>
             <label>Parola</label>
             <InputField
