@@ -9,12 +9,12 @@ const PageWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;   /* 🔥 Tam ortalama */
   font-family: "Poppins", sans-serif;
   color: white;
 
-  /* Arka plana hafif blur etkisi */
   backdrop-filter: blur(8px);
-  padding-top: 40px;
+  padding-top: 60px;   /* Üst boşluk daha iyi görünüm için */
 `;
 
 // ---------- Başlıklar ----------
@@ -35,9 +35,10 @@ const SubHeading = styled.p`
 const OptionsGrid = styled.div`
   display: grid;
   gap: 2rem;
+  justify-content: center;   /* 🔥 Kartları ortala */
 
   @media (min-width: 768px) {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr); /* 🔥 2 kart yan yana ve ortada */
   }
 `;
 
@@ -53,30 +54,25 @@ const OptionCard = styled(Link)`
   flex-direction: column;
   align-items: center;
 
+  width: 260px;  /* 🔥 Kart genişliği sabitlendi & ortalandı */
+
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(14px);
   transition: 0.3s ease-in-out;
 
-&:hover {
-  transform: translateY(-12px) scale(1.07);
-  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.55);
+  &:hover {
+    transform: translateY(-12px) scale(1.07);
+    box-shadow: 0 25px 45px rgba(0, 0, 0, 0.55);
+    background: linear-gradient(135deg, #42e3d9, #2b91ff);
+    color: white;
+  }
 
-  /* 🔥 Arka planı sayfa gradientine çevir */
-  background: linear-gradient(135deg, #42e3d9, #2b91ff);
-
-  /* 🔥 Yazı rengini beyaz yap */
-  color: white;
-}
-
-
-  /* --- SVG 3D ICON --- */
   svg {
     width: 72px;
     height: 72px;
     margin-bottom: 1.2rem;
     stroke-width: 1.7;
 
-    /* 3D ışık-gölge efekti */
     filter:
       drop-shadow(0px 3px 3px rgba(0, 0, 0, 0.4))
       drop-shadow(0px 0px 12px rgba(255, 255, 255, 0.5))

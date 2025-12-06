@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import {
   PageWrapper,
   Heading,
@@ -19,14 +18,7 @@ function LandingPage() {
 
         {/* GÖNÜLLÜ */}
         <OptionCard to="/volunteer-login">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="72"
-            height="72"
-            fill="none"
-            stroke="url(#gradientVolunteer)"
-            strokeWidth="1.7"
-          >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="url(#gradientVolunteer)" strokeWidth="1.7">
             <defs>
               <linearGradient id="gradientVolunteer" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%" stopColor="#ffffff" />
@@ -45,19 +37,13 @@ function LandingPage() {
               d="M18 15l3 3m0 0l-3 3m3-3H9"
             />
           </svg>
+
           <OptionLabel>Gönüllü Girişi</OptionLabel>
         </OptionCard>
 
-        {/* FİRMA GİRİŞİ */}
+        {/* FİRMA */}
         <OptionCard to="/company-login">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="72"
-            height="72"
-            fill="none"
-            stroke="url(#gradientCompany)"
-            strokeWidth="1.7"
-          >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="url(#gradientCompany)" strokeWidth="1.7">
             <defs>
               <linearGradient id="gradientCompany" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%" stopColor="#ffffff" />
@@ -73,33 +59,6 @@ function LandingPage() {
           </svg>
 
           <OptionLabel>Firma Girişi</OptionLabel>
-        </OptionCard>
-
-        {/* YÖNETİCİ */}
-        <OptionCard to="/admin-login">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="72"
-            height="72"
-            fill="none"
-            stroke="url(#gradientAdmin)"
-            strokeWidth="1.7"
-          >
-            <defs>
-              <linearGradient id="gradientAdmin" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#ffffff" />
-                <stop offset="90%" stopColor="#4ecbff" />
-              </linearGradient>
-            </defs>
-
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 6V3m0 0l3 3m-3-3L9 6m0 0v3m3 3h3M9 9H6m9 3h3m-6 0v3m0 0l3 3m-3-3l-3 3"
-            />
-          </svg>
-
-          <OptionLabel>Yönetici Girişi</OptionLabel>
         </OptionCard>
 
       </OptionsGrid>

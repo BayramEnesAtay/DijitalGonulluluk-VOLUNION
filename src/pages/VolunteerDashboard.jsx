@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   DashboardContainer,
   Sidebar,
@@ -10,56 +10,170 @@ import {
   SelectBox,
   JobList,
   JobCard,
-  PaginationWrapper,
+  JobButton,
+  ModalOverlay,
+  ModalBox,
 } from "../styles/VolunteerDashboardStyles.js";
+
+import { db, auth } from "../firebase";
+import {
+  collection,
+  query,
+  orderBy,
+  where,
+  onSnapshot,
+  addDoc,
+} from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+
+const SECTORS = [
+  "Market / Perakende",
+  "Lojistik / Taşımacılık",
+  "Restoran / Kafe",
+  "IT / Yazılım",
+  "Üretim",
+  "Eğitim",
+  "Sağlık",
+  "Turizm",
+  "Finans / Sigorta",
+  "Tekstil",
+  "Gıda Üretim",
+  "Diğer",
+];
 
 function VolunteerDashboard() {
   const [activePage, setActivePage] = useState("profile");
+
+  const [uid, setUid] = useState(null);
+  const [jobs, setJobs] = useState([]);
+  const [applications, setApplications] = useState([]);
+
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("");
   const [sort, setSort] = useState("");
 
-  const mockJobs = [
-    { id: 1, title: "Depo Elemanı", company: "Kardeşler Lojistik", type: "Lojistik", rating: 4.7 },
-    { id: 2, title: "Satış Destek", company: "Beyazlar Market", type: "Market", rating: 4.2 },
-    { id: 3, title: "Garson", company: "Mavi Kafe", type: "Restoran", rating: 4.9 },
-  ];
+  const [showModal, setShowModal] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
+
+  const [fullname, setFullname] = useState("");
+  const [phone, setPhone] = useState("");
+  const [note, setNote] = useState("");
+
+  /* 🔥 GİRİŞ YAPAN KULLANICININ UID'SİNİ AL */
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUid(user.uid);
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  /* 🔥 TÜM İLANLARI DİNLE (BAĞIMSIZ) */
+  useEffect(() => {
+    const q = query(collection(db, "listings"), orderBy("createdAt", "desc"));
+
+    const unsub = onSnapshot(q, (snap) => {
+      setJobs(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    });
+
+    return () => unsub();
+  }, []);
+
+  /* 🔥 BAŞVURULARI DİNLE (UID GELDİKTEN SONRA) */
+  useEffect(() => {
+    if (!uid) return;
+
+    const q = query(
+      collection(db, "applications"),
+      where("volunteerId", "==", uid),
+      orderBy("createdAt", "desc")
+    );
+
+    const unsub = onSnapshot(q, (snap) => {
+      setApplications(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    });
+
+    return () => unsub();
+  }, [uid]);
+
+  /* 🔥 Kullanıcının hangi ilanlara başvurduğu */
+  const appliedIds = applications.map((a) => a.jobId);
+
+  /* 🔥 BAŞVURU GÖNDER */
+  const sendApplication = async () => {
+    if (!fullname || !phone) {
+      alert("Ad Soyad ve Telefon zorunludur!");
+      return;
+    }
+
+    await addDoc(collection(db, "applications"), {
+      volunteerId: uid,
+      jobId: selectedJob.id,
+      jobTitle: selectedJob.title,
+      companyId: selectedJob.companyId,
+      companyName: selectedJob.companyName,
+      fullname,
+      phone,
+      note,
+      createdAt: Date.now(),
+    });
+
+    alert("Başvuru gönderildi!");
+
+    setShowModal(false);
+    setFullname("");
+    setPhone("");
+    setNote("");
+  };
+
+  /* 🔥 Arama – Filtre – Sıralama */
+  const filteredJobs = jobs
+    .filter((job) =>
+      job.title.toLowerCase().includes(search.toLowerCase()) ||
+      job.companyName?.toLowerCase().includes(search.toLowerCase())
+    )
+    .filter((job) => !filter || job.sector === filter)
+    .sort((a, b) =>
+      sort === "desc"
+        ? b.companyRating - a.companyRating
+        : sort === "asc"
+        ? a.companyRating - b.companyRating
+        : 0
+    );
 
   return (
     <DashboardContainer>
-      
-      {/* SIDEBAR */}
       <Sidebar>
         <SidebarItem onClick={() => setActivePage("profile")}>Profilim</SidebarItem>
-        <SidebarItem onClick={() => setActivePage("jobs")}>İlan Listesi</SidebarItem>
+        <SidebarItem onClick={() => setActivePage("jobs")}>İlanlar</SidebarItem>
         <SidebarItem onClick={() => setActivePage("applications")}>Başvurularım</SidebarItem>
       </Sidebar>
 
-      {/* CONTENT */}
       <Content>
-
+        {/* 🔵 PROFİL */}
         {activePage === "profile" && (
           <ProfileCard>
-            <h2>Hoş Geldin, Enes! 👋</h2>
-            <p>Bugün senin için 3 yeni ilan bulduk!</p>
+            <h2>Hoş Geldin!</h2>
+            <p>{applications.length} adet başvurun var.</p>
           </ProfileCard>
         )}
 
+        {/* 🔵 İLAN LİSTESİ */}
         {activePage === "jobs" && (
           <>
             <SearchBar
-              placeholder="Firma adı veya ilan ara..."
+              placeholder="İlan ara…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
 
             <FilterContainer>
               <SelectBox value={filter} onChange={(e) => setFilter(e.target.value)}>
-                <option value="">Firma Türü</option>
-                <option>Market</option>
-                <option>Lojistik</option>
-                <option>Restoran</option>
-                <option>Yazılım</option>
+                <option value="">Tüm Sektörler</option>
+                {SECTORS.map((s) => (
+                  <option key={s}>{s}</option>
+                ))}
               </SelectBox>
 
               <SelectBox value={sort} onChange={(e) => setSort(e.target.value)}>
@@ -70,31 +184,78 @@ function VolunteerDashboard() {
             </FilterContainer>
 
             <JobList>
-              {mockJobs.map(job => (
-                <JobCard key={job.id}>
-                  <h3>{job.title}</h3>
-                  <p>{job.company}</p>
-                  <span>Puan: {job.rating}</span>
-                </JobCard>
-              ))}
-            </JobList>
+              {filteredJobs.map((job) => {
+                const already = appliedIds.includes(job.id);
 
-            <PaginationWrapper>
-              <button>{"<"}</button>
-              <span>1 / 3</span>
-              <button>{">"}</button>
-            </PaginationWrapper>
+                return (
+                  <JobCard key={job.id}>
+                    <h3>{job.title}</h3>
+                    <p>{job.companyName}</p>
+                    <p>Puan: {job.companyRating}</p>
+
+                    <JobButton
+                      disabled={already}
+                      onClick={() => {
+                        setSelectedJob(job);
+                        setShowModal(true);
+                      }}
+                    >
+                      {already ? "Başvuruldu ✔" : "Başvur"}
+                    </JobButton>
+                  </JobCard>
+                );
+              })}
+            </JobList>
           </>
         )}
 
+        {/* 🔵 BAŞVURULAR */}
         {activePage === "applications" && (
           <ProfileCard>
             <h2>Başvurularım</h2>
-            <p>Henüz başvurun bulunmuyor.</p>
+
+            {applications.length === 0 && <p>Henüz başvurun yok.</p>}
+
+            {applications.map((item) => (
+              <div key={item.id} style={{ marginBottom: "10px" }}>
+                <strong>{item.jobTitle}</strong>
+                <p>{item.companyName}</p>
+              </div>
+            ))}
           </ProfileCard>
         )}
-
       </Content>
+
+      {/* 🔵 MODAL */}
+      {showModal && (
+        <ModalOverlay>
+          <ModalBox>
+            <h3>{selectedJob?.title} ilanına başvur</h3>
+
+            <input
+              placeholder="Ad Soyad"
+              value={fullname}
+              onChange={(e) => setFullname(e.target.value)}
+            />
+            <input
+              placeholder="Telefon"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+            <textarea
+              rows={3}
+              placeholder="Açıklama"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            />
+
+            <button onClick={sendApplication}>Gönder</button>
+            <button style={{ background: "#555" }} onClick={() => setShowModal(false)}>
+              Kapat
+            </button>
+          </ModalBox>
+        </ModalOverlay>
+      )}
     </DashboardContainer>
   );
 }

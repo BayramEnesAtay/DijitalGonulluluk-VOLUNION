@@ -3,88 +3,70 @@ import styled from "styled-components";
 export const DashboardContainer = styled.div`
   display: flex;
   height: 100vh;
-  overflow: hidden;
+  width: 100%;
   background: linear-gradient(135deg, #10e6c5, #1e70f2);
 `;
 
-/* ---------------- SIDEBAR ---------------- */
 export const Sidebar = styled.div`
   width: 240px;
   background: #1f2a40cc;
-  backdrop-filter: blur(6px);
-  color: white;
-  padding: 22px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 18px;
+  color: white;
 `;
 
 export const SidebarItem = styled.div`
-  padding: 12px 16px;
+  padding: 14px 16px;
   background: #27344ecc;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: 0.2s;
-  font-size: 16px;
+  transition: 0.25s;
 
   &:hover {
-    background: #3b4d6cee;
-    transform: translateX(4px);
+    background: #3b4d6cdd;
+    transform: translateX(6px);
   }
 `;
 
-/* ---------------- CONTENT ---------------- */
 export const Content = styled.div`
   flex: 1;
-  padding: 30px;
+  padding: 32px;
   overflow-y: auto;
 `;
 
-/* ---------------- PROFILE CARD (Eksik Olan Buydu) ---------------- */
 export const ProfileCard = styled.div`
-  background: rgba(255, 255, 255, 0.94);
-  padding: 24px;
-  border-radius: 14px;
+  background: #ffffffee;
+  padding: 22px;
+  border-radius: 12px;
   max-width: 520px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-  margin-bottom: 25px;
-
-  h2 { margin-bottom: 10px; }
-  p { opacity: 0.85; }
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 `;
 
-/* ---------------- SEARCH ---------------- */
 export const SearchBar = styled.input`
   width: 60%;
-  max-width: 600px;
-  min-width: 260px;
-  padding: 14px 18px;
+  padding: 14px;
   border-radius: 10px;
   border: none;
-  outline: none;
-  background: rgba(255,255,255,0.9);
-  font-size: 15px;
-  margin-bottom: 15px;
-`;
-
-/* ---------------- FILTERS ---------------- */
-export const FilterContainer = styled.div`
-  display: flex;
-  gap: 15px;
+  background: white;
   margin-bottom: 20px;
 `;
 
-export const SelectBox = styled.select`
-  padding: 12px 18px;
-  border-radius: 10px;
-  border: none;
-  outline: none;
-  min-width: 150px;
-  background: rgba(255,255,255,0.9);
-  font-size: 15px;
+export const FilterContainer = styled.div`
+  display: flex;
+  gap: 15px;
+  margin-bottom: 18px;
 `;
 
-/* ---------------- JOB CARDS ---------------- */
+export const SelectBox = styled.select`
+  padding: 14px 16px;
+  background: white;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+`;
+
 export const JobList = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -92,40 +74,61 @@ export const JobList = styled.div`
 `;
 
 export const JobCard = styled.div`
-  background: rgba(255,255,255,0.92);
+  background: #ffffffdd;
   padding: 18px;
-  border-radius: 14px;
-  min-height: 150px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  transition: 0.25s;
-
-  &:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 8px 18px rgba(0,0,0,0.18);
-  }
-
-  h3 { margin-bottom: 6px; }
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 `;
 
-/* ---------------- PAGINATION ---------------- */
-export const PaginationWrapper = styled.div`
-  margin-top: 30px;
+export const JobButton = styled.button`
+  margin-top: auto;
+  padding: 10px;
+  background: ${(p) => (p.disabled ? "#999" : "#1f2a40")};
+  color: white;
+  border-radius: 8px;
+  border: none;
+  cursor: ${(p) => (p.disabled ? "not-allowed" : "pointer")};
+
+  &:hover {
+    background: ${(p) => (p.disabled ? "#999" : "#324163")};
+  }
+`;
+
+export const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.55);
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+
+export const ModalBox = styled.div`
+  background: white;
+  padding: 30px;
+  width: 420px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 
+  input, textarea {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+  }
+
   button {
-    padding: 8px 14px;
-    border-radius: 8px;
-    border: none;
+    padding: 12px;
     background: #1f2a40;
     color: white;
+    border-radius: 10px;
     cursor: pointer;
-    transition: 0.2s;
-
-    &:hover {
-      background: #364462;
-    }
   }
 `;
