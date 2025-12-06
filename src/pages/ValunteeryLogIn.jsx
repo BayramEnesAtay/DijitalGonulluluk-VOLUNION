@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   LoginContainer,
   LoginHeading,
@@ -7,7 +8,9 @@ import {
   SubmitButton,
   AltLogin,
   AltButtons,
-  AltButton
+  AltButton,
+  SignUpText,
+  FormWrapper
 } from "../styles/ValuenterryLogIn.js";
 
 function VolunteerLogin() {
@@ -16,11 +19,6 @@ function VolunteerLogin() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert(`Kullanıcı: ${username}\nŞifre: ${password}`);
-  };
-
-  const handleGoogleLogin = () => {
-    alert("Google ile giriş seçildi.");
   };
 
   return (
@@ -28,41 +26,43 @@ function VolunteerLogin() {
       <LoginHeading>Gönüllü Girişi</LoginHeading>
 
       <form onSubmit={handleSubmit}>
-        <FormGroup>
-          <label htmlFor="username">Kullanıcı Adı</label>
-          <InputField
-            id="username"
-            type="text"
-            placeholder="Kullanıcı adınızı giriniz"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </FormGroup>
+        <FormWrapper>
+          <FormGroup>
+            <label>Kullanıcı Adı</label>
+            <InputField
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Kullanıcı adınızı giriniz"
+            />
+          </FormGroup>
 
-        <FormGroup>
-          <label htmlFor="password">Şifre</label>
-          <InputField
-            id="password"
-            type="password"
-            placeholder="Şifrenizi giriniz"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </FormGroup>
+          <FormGroup>
+            <label>Şifre</label>
+            <InputField
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Şifrenizi giriniz"
+            />
+          </FormGroup>
 
-        <SubmitButton type="submit">Giriş Yap</SubmitButton>
+          <SubmitButton type="submit">Giriş Yap</SubmitButton>
+        </FormWrapper>
       </form>
 
-      <AltLogin>
-        veya
+      <FormWrapper>
+        <AltLogin>veya</AltLogin>
+
         <AltButtons>
-          <AltButton type="button" onClick={handleGoogleLogin}>
-            Google ile Giriş
-          </AltButton>
+          <AltButton>Google ile Giriş</AltButton>
         </AltButtons>
-      </AltLogin>
+
+        <SignUpText>
+          Hesabınız yok mu?
+          <Link to="/volunteer-signup">Hesap Oluştur</Link>
+        </SignUpText>
+      </FormWrapper>
     </LoginContainer>
   );
 }
