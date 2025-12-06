@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+
 import {
   SignUpContainer,
   SignUpHeading,
@@ -12,8 +13,9 @@ import {
   LoginRedirect
 } from "../styles/CompanySignUpStyles.js";
 
-import { auth } from "../firebase.js";
+import { auth, db } from "../firebase.js";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 
 // ------------------ 81 İL LİSTESİ ------------------
 const cities = [
@@ -30,7 +32,6 @@ const cities = [
   "Yalova","Yozgat","Zonguldak"
 ];
 
-// ------------------ GENİŞ FİRMA TÜRÜ LİSTESİ ------------------
 const companyTypes = [
   "Tekstil","Gıda Üretim","Restoran / Kafe","Market / Perakende",
   "Lojistik / Taşımacılık","Otomotiv","Mobilya","Elektrik / Elektronik",
@@ -81,17 +82,35 @@ function CompanySignUp() {
   };
 
   // ---------------- HANDLERS ----------------
-  const handleNext1 = () => { if (validateStep(form1)) setStep(2); };
-  const handleNext2 = () => { if (validateStep(form2)) setStep(3); };
+  const handleNext1 = () => validateStep(form1) && setStep(2);
+  const handleNext2 = () => validateStep(form2) && setStep(3);
 
+  // ---------------- KAYIT OL ----------------
   const handleSubmit = async () => {
     if (!validateStep(form3)) return;
 
     try {
-      await createUserWithEmailAndPassword(auth, form3.email, form3.password);
+      // Auth kayıt
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        form3.email,
+        form3.password
+      );
+
+      const user = userCredential.user;
+
+      // Firestore'a şirket kaydı
+      await setDoc(doc(db, "companies", user.uid), {
+        ...form1,
+        ...form2,
+        ...form3,
+        rating: 50,            // ⭐ Şirket başlangıç puanı
+        createdAt: Date.now(), // Tarih
+        uid: user.uid,
+        email: form3.email,
+      });
 
       alert("🎉 Firma kaydı başarıyla oluşturuldu!");
-
     } catch (err) {
       if (err.code === "auth/email-already-in-use") {
         setErrors({ email: "Bu email zaten kayıtlı!" });
@@ -112,46 +131,41 @@ function CompanySignUp() {
         <FormWrapper>
           <FormGroup>
             <label>Firma Adı</label>
-            <InputField
-              value={form1.companyName}
-              onChange={(e) => setForm1({ ...form1, companyName: e.target.value })}
-            />
+            <InputField value={form1.companyName} onChange={(e) =>
+              setForm1({ ...form1, companyName: e.target.value })
+            }/>
             {errors.companyName && <ErrorText>{errors.companyName}</ErrorText>}
           </FormGroup>
 
           <FormGroup>
             <label>Adres</label>
-            <InputField
-              value={form1.address}
-              onChange={(e) => setForm1({ ...form1, address: e.target.value })}
-            />
+            <InputField value={form1.address} onChange={(e) =>
+              setForm1({ ...form1, address: e.target.value })
+            }/>
             {errors.address && <ErrorText>{errors.address}</ErrorText>}
           </FormGroup>
 
           <FormGroup>
             <label>Mahalle</label>
-            <InputField
-              value={form1.neighborhood}
-              onChange={(e) => setForm1({ ...form1, neighborhood: e.target.value })}
-            />
+            <InputField value={form1.neighborhood} onChange={(e) =>
+              setForm1({ ...form1, neighborhood: e.target.value })
+            }/>
             {errors.neighborhood && <ErrorText>{errors.neighborhood}</ErrorText>}
           </FormGroup>
 
           <FormGroup>
             <label>İlçe</label>
-            <InputField
-              value={form1.district}
-              onChange={(e) => setForm1({ ...form1, district: e.target.value })}
-            />
+            <InputField value={form1.district} onChange={(e) =>
+              setForm1({ ...form1, district: e.target.value })
+            }/>
             {errors.district && <ErrorText>{errors.district}</ErrorText>}
           </FormGroup>
 
           <FormGroup>
             <label>İl</label>
-            <SelectField
-              value={form1.city}
-              onChange={(e) => setForm1({ ...form1, city: e.target.value })}
-            >
+            <SelectField value={form1.city} onChange={(e) =>
+              setForm1({ ...form1, city: e.target.value })
+            }>
               <option value="">Seçiniz</option>
               {cities.map((c, i) => (
                 <option key={i} value={c}>{c}</option>
@@ -161,19 +175,16 @@ function CompanySignUp() {
           </FormGroup>
 
           <FormGroup>
-            <label>İşletme Telefonu</label>
-            <InputField
-              value={form1.phone}
-              onChange={(e) => setForm1({ ...form1, phone: e.target.value })}
-            />
+            <label>Telefon</label>
+            <InputField value={form1.phone} onChange={(e) =>
+              setForm1({ ...form1, phone: e.target.value })
+            }/>
             {errors.phone && <ErrorText>{errors.phone}</ErrorText>}
           </FormGroup>
 
           <ActionButton onClick={handleNext1}>Devam Et</ActionButton>
-
           <LoginRedirect>
-            Hesabınız var mı?
-            <Link to="/company-login">Giriş Yap</Link>
+            Hesabınız var mı? <Link to="/company-login">Giriş Yap</Link>
           </LoginRedirect>
         </FormWrapper>
       )}
@@ -183,10 +194,9 @@ function CompanySignUp() {
         <FormWrapper>
           <FormGroup>
             <label>Firma Türü</label>
-            <SelectField
-              value={form2.companyType}
-              onChange={(e) => setForm2({ ...form2, companyType: e.target.value })}
-            >
+            <SelectField value={form2.companyType} onChange={(e) =>
+              setForm2({ ...form2, companyType: e.target.value })
+            }>
               <option value="">Seçiniz</option>
               {companyTypes.map((t, i) => (
                 <option key={i} value={t}>{t}</option>
@@ -197,27 +207,23 @@ function CompanySignUp() {
 
           <FormGroup>
             <label>Vergi No</label>
-            <InputField
-              value={form2.taxNumber}
-              onChange={(e) => setForm2({ ...form2, taxNumber: e.target.value })}
-            />
+            <InputField value={form2.taxNumber} onChange={(e) =>
+              setForm2({ ...form2, taxNumber: e.target.value })
+            }/>
             {errors.taxNumber && <ErrorText>{errors.taxNumber}</ErrorText>}
           </FormGroup>
 
           <FormGroup>
             <label>Vergi Dairesi</label>
-            <InputField
-              value={form2.taxOffice}
-              onChange={(e) => setForm2({ ...form2, taxOffice: e.target.value })}
-            />
+            <InputField value={form2.taxOffice} onChange={(e) =>
+              setForm2({ ...form2, taxOffice: e.target.value })
+            }/>
             {errors.taxOffice && <ErrorText>{errors.taxOffice}</ErrorText>}
           </FormGroup>
 
           <ActionButton onClick={handleNext2}>Devam Et</ActionButton>
-
           <LoginRedirect>
-            Hesabınız var mı?
-            <Link to="/company-login">Giriş Yap</Link>
+            Hesabınız var mı? <Link to="/company-login">Giriş Yap</Link>
           </LoginRedirect>
         </FormWrapper>
       )}
@@ -227,46 +233,40 @@ function CompanySignUp() {
         <FormWrapper>
           <FormGroup>
             <label>Ad Soyad</label>
-            <InputField
-              value={form3.fullname}
-              onChange={(e) => setForm3({ ...form3, fullname: e.target.value })}
-            />
+            <InputField value={form3.fullname} onChange={(e) =>
+              setForm3({ ...form3, fullname: e.target.value })
+            }/>
             {errors.fullname && <ErrorText>{errors.fullname}</ErrorText>}
           </FormGroup>
 
           <FormGroup>
             <label>Telefon</label>
-            <InputField
-              value={form3.phone}
-              onChange={(e) => setForm3({ ...form3, phone: e.target.value })}
-            />
+            <InputField value={form3.phone} onChange={(e) =>
+              setForm3({ ...form3, phone: e.target.value })
+            }/>
             {errors.phone && <ErrorText>{errors.phone}</ErrorText>}
           </FormGroup>
 
           <FormGroup>
             <label>E-Posta</label>
-            <InputField
-              value={form3.email}
-              onChange={(e) => setForm3({ ...form3, email: e.target.value })}
-            />
+            <InputField value={form3.email} onChange={(e) =>
+              setForm3({ ...form3, email: e.target.value })
+            }/>
             {errors.email && <ErrorText>{errors.email}</ErrorText>}
           </FormGroup>
 
           <FormGroup>
             <label>Parola</label>
-            <InputField
-              type="password"
-              value={form3.password}
-              onChange={(e) => setForm3({ ...form3, password: e.target.value })}
-            />
+            <InputField type="password" value={form3.password} onChange={(e) =>
+              setForm3({ ...form3, password: e.target.value })
+            }/>
             {errors.password && <ErrorText>{errors.password}</ErrorText>}
           </FormGroup>
 
           <ActionButton onClick={handleSubmit}>Hesap Oluştur</ActionButton>
 
           <LoginRedirect>
-            Hesabınız var mı?
-            <Link to="/company-login">Giriş Yap</Link>
+            Hesabınız var mı? <Link to="/company-login">Giriş Yap</Link>
           </LoginRedirect>
         </FormWrapper>
       )}

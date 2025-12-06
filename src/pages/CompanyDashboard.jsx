@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   DashboardContainer,
   Sidebar,
@@ -11,33 +11,142 @@ import {
   JobList,
   JobCard,
   PaginationWrapper,
-  ListPageWrapper,
 } from "../styles/CompanyDashboardStyles";
+
+import { db, auth } from "../firebase";
+import {
+  addDoc,
+  collection,
+  getDoc,
+  doc,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+} from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+
+const SECTORS = [
+  "Market / Perakende",
+  "Lojistik / Taşımacılık",
+  "Restoran / Kafe",
+  "IT / Yazılım",
+  "Üretim",
+  "Eğitim",
+  "Sağlık",
+  "Turizm",
+  "Finans / Sigorta",
+  "Tekstil",
+  "Gıda Üretim",
+  "Diğer",
+];
+
+// REALTIME - İlanlarım
+const listenMyJobs = (uid, setMyJobs) => {
+  const q = query(
+    collection(db, "listings"),
+    where("companyId", "==", uid),
+    orderBy("createdAt", "desc")
+  );
+  return onSnapshot(q, snap => {
+    setMyJobs(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+  });
+};
+
+// REALTIME - Tüm İlanlar
+const listenAllJobs = (setAllJobs) => {
+  const q = query(collection(db, "listings"), orderBy("createdAt", "desc"));
+  return onSnapshot(q, snap => {
+    setAllJobs(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+  });
+};
 
 function CompanyDashboard() {
   const [activePage, setActivePage] = useState("profile");
 
-  const myJobs = [
-    { id: 1, title: "Depo Elemanı", applications: 12, status: "Aktif" },
-    { id: 2, title: "Garson", applications: 5, status: "Devam Ediyor" },
-  ];
+  const [title, setTitle] = useState("");
+  const [desc, setDesc] = useState("");
+  const [location, setLocation] = useState("");
+  const [sector, setSector] = useState("");
 
-  const applications = [
-    { id: 1, name: "Ahmet Korkmaz", job: "Depo Elemanı", score: 4.8 },
-    { id: 2, name: "Merve Yılmaz", job: "Garson", score: 4.2 },
-  ];
+  const [currentUser, setCurrentUser] = useState(null);
+  const [myJobs, setMyJobs] = useState([]);
+  const [allJobs, setAllJobs] = useState([]);
+
+  const [search, setSearch] = useState("");
+  const [filterSector, setFilterSector] = useState("");
+  const [sortOrder, setSortOrder] = useState("");
+
+  // Auth takip + realtime dinleyiciler
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      if (user) {
+        listenMyJobs(user.uid, setMyJobs);
+        listenAllJobs(setAllJobs);
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  // İlan oluştur
+  const handleCreateListing = async () => {
+    if (!title || !desc || !location || !sector) {
+      alert("Tüm alanları doldurun!");
+      return;
+    }
+
+    try {
+      const user = auth.currentUser;
+
+      const ref = doc(db, "companies", user.uid);
+      const snap = await getDoc(ref);
+      const rating = snap.exists() ? snap.data()?.rating ?? 50 : 50;
+
+      await addDoc(collection(db, "listings"), {
+        title,
+        description: desc,
+        location,
+        sector,
+        companyId: user.uid,
+        companyName: user.email,
+        companyRating: rating,
+        createdAt: Date.now(),
+      });
+
+      setTitle("");
+      setDesc("");
+      setLocation("");
+      setSector("");
+
+      alert("İlan başarıyla yayınlandı!");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // Filtreleme
+  const resultJobs = allJobs
+    .filter(j =>
+      j.title.toLowerCase().includes(search.toLowerCase()) &&
+      (!filterSector || j.sector === filterSector)
+    )
+    .sort((a, b) => {
+      if (!sortOrder) return 0;
+      return sortOrder === "asc"
+        ? a.companyRating - b.companyRating
+        : b.companyRating - a.companyRating;
+    });
 
   return (
     <DashboardContainer>
-      {/* Sol menü */}
       <Sidebar>
         {[
           { key: "profile", label: "Profilim" },
           { key: "create", label: "İlan Oluştur" },
           { key: "myjobs", label: "İlanlarım" },
-          { key: "applications", label: "Başvurular" },
           { key: "list", label: "İlan Listesi" },
-        ].map((item) => (
+        ].map(item => (
           <SidebarItem
             key={item.key}
             className={activePage === item.key ? "active" : ""}
@@ -48,150 +157,86 @@ function CompanyDashboard() {
         ))}
       </Sidebar>
 
-      {/* İçerik alanı */}
       <Content>
+
+        {/* PROFİL */}
         {activePage === "profile" && (
           <Card>
-            <h2>Hoş Geldin, DigitalVolunteery Şirketi 👋</h2>
-            <p>Sektör: Yazılım & Bilişim</p>
-            <p>Toplam Yayında İlan: 3</p>
-            <p>Başvuruda Bulunan Gönüllü: 18</p>
+            <h2>Hoş Geldin 👋</h2>
+            <p>Email: {currentUser?.email}</p>
+            <p>Toplam İlan: {myJobs.length}</p>
           </Card>
         )}
 
+        {/* İLAN OLUŞTUR */}
         {activePage === "create" && (
-  <Card style={{ maxWidth: "600px" }}>
-    <h2>Yeni İlan Oluştur</h2>
+          <Card>
+            <h2>Yeni İlan Oluştur</h2>
 
-    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-      <input placeholder="İlan Başlığı" />
-      <textarea placeholder="Açıklama" rows="4" />
-      <input placeholder="Konum" />
+            <input placeholder="İlan Başlığı" value={title} onChange={e => setTitle(e.target.value)} />
+            <textarea placeholder="Açıklama" rows={4} value={desc} onChange={e => setDesc(e.target.value)} />
+            <input placeholder="Konum" value={location} onChange={e => setLocation(e.target.value)} />
 
-      <SelectBox>
-        <option value="">Sektör Seçiniz</option>
-        <option>Tekstil</option>
-        <option>Gıda Üretim</option>
-        <option>Restoran / Kafe</option>
-        <option>Market / Perakende</option>
-        <option>Lojistik / Taşımacılık</option>
-        <option>Otomotiv</option>
-        <option>Mobilya</option>
-        <option>Elektrik / Elektronik</option>
-        <option>İnşaat</option>
-        <option>Emlak</option>
-        <option>Eğitim</option>
-        <option>Turizm</option>
-        <option>Sağlık</option>
-        <option>Temizlik Hizmetleri</option>
-        <option>Güzellik Merkezi</option>
-        <option>AVM Mağazası</option>
-        <option>IT / Yazılım</option>
-        <option>Reklam / Medya</option>
-        <option>Finans / Sigorta</option>
-        <option>Tarım</option>
-        <option>Hayvancılık</option>
-        <option>Hırdavat</option>
-        <option>Kimya</option>
-        <option>Metal İşleme</option>
-        <option>Ambalaj</option>
-        <option>Kargo</option>
-        <option>Danışmanlık</option>
-        <option>Spor Salonu</option>
-        <option>Kırtasiye</option>
-        <option>Fotoğrafçılık</option>
-        <option>Petshop</option>
-        <option>Diğer</option>
-      </SelectBox>
+            <select value={sector} onChange={e => setSector(e.target.value)}>
+              <option value="">Sektör Seçiniz</option>
+              {SECTORS.map(s => <option key={s}>{s}</option>)}
+            </select>
 
-      <button
-        style={{
-          padding: "12px",
-          borderRadius: "8px",
-          background: "#1f2a40",
-          color: "white",
-          cursor: "pointer",
-        }}
-      >
-        Yayınla
-      </button>
-    </div>
-  </Card>
-)}
+            <button onClick={handleCreateListing}>Yayınla</button>
+          </Card>
+        )}
 
-
+        {/* İLANLARIM */}
         {activePage === "myjobs" && (
           <>
-            <h2>Yayınlanan İlanlar</h2>
+            <h2>İlanlarım</h2>
             <JobList>
-              {myJobs.map((job) => (
-                <JobCard key={job.id}>
-                  <h3>{job.title}</h3>
-                  <p>Başvuru Sayısı: {job.applications}</p>
-                  <p>Durum: {job.status}</p>
+              {myJobs.map(j => (
+                <JobCard key={j.id}>
+                  <h3>{j.title}</h3>
+                  <p>{j.location}</p>
+                  <p>{j.sector}</p>
+                  <p>Puan: {j.companyRating} ⭐</p>
                 </JobCard>
               ))}
             </JobList>
           </>
         )}
 
-        {activePage === "applications" && (
-          <>
-            <h2>Gelen Başvurular</h2>
-            <JobList>
-              {applications.map((app) => (
-                <JobCard key={app.id}>
-                  <h3>{app.name}</h3>
-                  <p>Başvurduğu Pozisyon: {app.job}</p>
-                  <p>Puan: {app.score}</p>
-                </JobCard>
-              ))}
-            </JobList>
-          </>
-        )}
-
+        {/* TÜM İLANLAR */}
         {activePage === "list" && (
-          <ListPageWrapper>
-            <SearchBar placeholder="İlan ara..." />
+          <>
+            <SearchBar
+              placeholder="İlan ara..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+
             <FilterContainer>
-              <SelectBox>
-                <option>Sektör</option>
-                <option>Yazılım</option>
-                <option>Lojistik</option>
-                <option>Restoran</option>
+              <SelectBox value={filterSector} onChange={e => setFilterSector(e.target.value)}>
+                <option value="">Tüm Sektörler</option>
+                {SECTORS.map(s => <option key={s}>{s}</option>)}
               </SelectBox>
-              <SelectBox>
-                <option>Puan Sırala</option>
-                <option>Yüksekten Düşüğe</option>
-                <option>Düşükten Yükseğe</option>
+
+              <SelectBox value={sortOrder} onChange={e => setSortOrder(e.target.value)}>
+                <option value="">Puan Sırala</option>
+                <option value="desc">Yüksekten Düşüğe</option>
+                <option value="asc">Düşükten Yükseğe</option>
               </SelectBox>
             </FilterContainer>
 
             <JobList>
-              <JobCard>
-                <h3>Depo Elemanı</h3>
-                <p>Kardeşler Lojistik</p>
-                <p className="score">Puan: 4.7 ⭐</p>
-              </JobCard>
-              <JobCard>
-                <h3>Garson</h3>
-                <p>Mavi Kafe</p>
-                <p className="score">Puan: 4.7 ⭐</p>
-              </JobCard>
-              <JobCard>
-                <h3>Satış Danışmanı</h3>
-                <p>AVM Mağazası</p>
-                <p className="score">Puan: 4.7 ⭐</p>
-              </JobCard>
+              {resultJobs.map(j => (
+                <JobCard key={j.id}>
+                  <h3>{j.title}</h3>
+                  <p>{j.companyName}</p>
+                  <p>Puan: {j.companyRating} ⭐</p>
+                </JobCard>
+              ))}
             </JobList>
-
-            <PaginationWrapper>
-              <button>{"<"}</button>
-              <span>1 / 5</span>
-              <button>{">"}</button>
-            </PaginationWrapper>
-          </ListPageWrapper>
+          </>
         )}
+
       </Content>
     </DashboardContainer>
   );
