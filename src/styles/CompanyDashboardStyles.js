@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
 // --- PROFESYONEL VE ZARİF TASARIM ---
 const theme = {
@@ -318,5 +318,170 @@ export const PaginationWrapper = styled.div`
       background: ${theme.bg};
       color: ${theme.primary};
     }
+  }
+`;
+
+/* =========================================
+   🔥 CHAT CSS (Styled Components) 
+   ========================================= */
+
+const fadeIn = keyframes`
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+`;
+
+const slideIn = keyframes`
+  from { transform: translateY(8px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+`;
+
+// Chat Penceresi (Sağ alt köşe, sabit)
+export const ChatWindowContainer = styled.div`
+  position: fixed;
+  bottom: 20px; 
+  right: 20px;
+  width: 380px;      /* Daha makul bir boyut */
+  height: 500px;     /* Daha makul bir boyut */
+  background: #ffffff;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.25);
+  overflow: hidden;
+  animation: ${fadeIn} 0.25s ease;
+  z-index: 999999;
+  border: 1px solid ${theme.border};
+`;
+
+// Chat Başlık
+export const ChatHeader = styled.div`
+  background: linear-gradient(135deg, #4a6cf7, #6a63ff);
+  color: white;
+  padding: 15px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+// Kapatma Butonu (Header içinde)
+export const CloseChatButton = styled.button`
+  background: transparent !important;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  width: auto !important;
+  min-width: auto !important;
+  margin: 0 !important;
+  
+  &:hover {
+    color: #ffcccc;
+    transform: scale(1.1);
+  }
+`;
+
+// Mesaj Alanı
+export const ChatMessages = styled.div`
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #f9f9f9;
+`;
+
+// Mesaj Baloncuğu
+export const MessageBubble = styled.div`
+  padding: 10px 14px;
+  border-radius: 14px;
+  max-width: 80%;
+  font-size: 14px;
+  word-wrap: break-word;
+  animation: ${slideIn} 0.2s ease;
+  
+  /* Gönderen Ben isem */
+  ${props => props.isMe ? `
+    background: #4a6cf7;
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 2px;
+  ` : `
+    background: #e5e5ea;
+    color: #333;
+    align-self: flex-start;
+    border-bottom-left-radius: 2px;
+  `}
+`;
+
+// Input Alanı
+export const ChatInputArea = styled.div`
+  padding: 15px;
+  display: flex;
+  gap: 10px;
+  background: white;
+  border-top: 1px solid #eee;
+`;
+
+// Chat Input
+export const ChatInput = styled.input`
+  flex: 1;
+  padding: 10px;
+  border-radius: 20px !important;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  
+  &:focus {
+    border-color: #4a6cf7;
+  }
+`;
+
+// Gönder Butonu (Chat içi)
+export const ChatSendButton = styled.button`
+  background: #4a6cf7 !important;
+  color: white;
+  border: none;
+  border-radius: 50% !important; /* Yuvarlak buton */
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  padding: 0 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  margin-top: 0 !important;
+  
+  &:hover {
+    background: #3b5bdb !important;
+    transform: scale(1.05);
+  }
+`;
+
+// Başvuru Listesindeki Küçük Chat İkonu Butonu
+export const IconChatButton = styled.button`
+  background: transparent !important;
+  border: none !important;
+  padding: 5px !important;
+  min-width: auto !important;
+  width: auto !important;
+  color: #4a6cf7 !important;
+  cursor: pointer;
+  margin: 0 !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  
+  &:hover {
+    color: #2B00D6 !important;
+    transform: scale(1.2);
+    box-shadow: none !important;
+    background: transparent !important;
   }
 `;

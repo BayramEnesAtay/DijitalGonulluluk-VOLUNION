@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 // useNavigate eklendi
 import { useNavigate } from "react-router-dom";
 import {
@@ -9,7 +9,17 @@ import {
   Card,
   JobList,
   JobCard,
-  LogoutItem, // 🔥 Stil dosyasından import edildi
+  LogoutItem,
+  // 🔥 CHAT İÇİN EKLENEN STİLLER
+  ChatWindowContainer,
+  ChatHeader,
+  CloseChatButton,
+  ChatMessages,
+  MessageBubble,
+  ChatInputArea,
+  ChatInput,
+  ChatSendButton,
+  IconChatButton
 } from "../styles/CompanyDashboardStyles";
 
 import { db, auth } from "../firebase";
@@ -79,7 +89,13 @@ function CompanyDashboard() {
   const [myJobs, setMyJobs] = useState([]);
   const [applications, setApplications] = useState([]);
 
-  const navigate = useNavigate(); // Yönlendirme için hook
+  // 🔥 CHAT STATE'LERİ
+  const [activeChat, setActiveChat] = useState(null); // Hangi başvuru ile konuşuyoruz?
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+  const messagesEndRef = useRef(null); // Otomatik scroll için
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
@@ -92,6 +108,46 @@ function CompanyDashboard() {
 
     return () => unsub();
   }, []);
+
+  // 🔥 CHAT MESAJLARINI DİNLE
+  useEffect(() => {
+    if (!activeChat || !currentUser) return;
+
+    // Chat ID: chat_{companyId}_{volunteerId}
+    const chatId = `chat_${currentUser.uid}_${activeChat.volunteerId}`;
+
+    // Mesajlar "chats" koleksiyonunun altında tutulacak
+    const q = query(
+      collection(db, "chats", chatId, "messages"),
+      orderBy("createdAt", "asc")
+    );
+
+    const unsub = onSnapshot(q, (snap) => {
+      setMessages(snap.docs.map(d => d.data()));
+      // Mesaj gelince aşağı kaydır
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    });
+
+    return () => unsub();
+  }, [activeChat, currentUser]);
+
+  // 🔥 MESAJ GÖNDER
+  const sendMessage = async () => {
+    if (!newMessage.trim() || !activeChat || !currentUser) return;
+
+    const chatId = `chat_${currentUser.uid}_${activeChat.volunteerId}`;
+
+    await addDoc(collection(db, "chats", chatId, "messages"), {
+      text: newMessage,
+      senderId: currentUser.uid,
+      senderType: "company", // Gönderen firma
+      createdAt: Date.now()
+    });
+
+    setNewMessage("");
+  };
 
   // 🔥 ÇIKIŞ YAP FONKSİYONU
   const handleLogout = async () => {
@@ -264,7 +320,18 @@ function CompanyDashboard() {
 
               return (
                 <div key={app.id} style={{ padding: "14px", borderBottom: "1px solid #ddd" }}>
-                  <h4>{app.jobTitle}</h4>
+                  <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                    <h4>{app.jobTitle}</h4>
+                    
+                    {/* 🔥 CHAT IKONU BUTONU */}
+                    <IconChatButton onClick={() => setActiveChat(app)} title="Gönüllüyle Sohbet Et">
+                      {/* Basit Chat SVG İkonu */}
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                         <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM20 16H6L4 18V4H20V16Z"/>
+                      </svg>
+                    </IconChatButton>
+                  </div>
+                  
                   <p><b>Başvuran:</b> {app.fullname}</p>
                   <p><b>Telefon:</b> {app.phone}</p>
 
@@ -297,6 +364,44 @@ function CompanyDashboard() {
             })}
           </Card>
         )}
+
+        {/* 🔥 CHAT PENCERESİ (SAĞ ALT KÖŞE) */}
+        {activeChat && (
+          <ChatWindowContainer>
+            <ChatHeader>
+              <span>{activeChat.fullname} ile Sohbet</span>
+              <CloseChatButton onClick={() => setActiveChat(null)}>✕</CloseChatButton>
+            </ChatHeader>
+
+            <ChatMessages>
+              {messages.map((msg, idx) => {
+                const isMe = msg.senderId === currentUser?.uid;
+                return (
+                  <MessageBubble key={idx} isMe={isMe}>
+                    {msg.text}
+                  </MessageBubble>
+                );
+              })}
+              <div ref={messagesEndRef} />
+            </ChatMessages>
+
+            <ChatInputArea>
+              <ChatInput 
+                placeholder="Mesaj yaz..." 
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+              />
+              <ChatSendButton onClick={sendMessage}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </ChatSendButton>
+            </ChatInputArea>
+          </ChatWindowContainer>
+        )}
+
       </Content>
     </DashboardContainer>
   );

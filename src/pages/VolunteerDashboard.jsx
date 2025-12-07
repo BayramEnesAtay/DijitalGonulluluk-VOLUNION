@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 // useNavigate import edildi
 import { useNavigate } from "react-router-dom"; 
 import {
@@ -15,7 +15,17 @@ import {
   JobButton,
   ModalOverlay,
   ModalBox,
-  LogoutItem, // 🔥 Yeni eklenen stil
+  LogoutItem,
+  // 🔥 CHAT İÇİN EKLENEN STİLLER
+  ChatWindowContainer,
+  ChatHeader,
+  CloseChatButton,
+  ChatMessages,
+  MessageBubble,
+  ChatInputArea,
+  ChatInput,
+  ChatSendButton,
+  IconChatButton
 } from "../styles/VolunteerDashboardStyles.js";
 
 import { db, auth } from "../firebase";
@@ -62,6 +72,12 @@ function VolunteerDashboard() {
   const [fullname, setFullname] = useState("");
   const [phone, setPhone] = useState("");
   const [note, setNote] = useState("");
+
+  // 🔥 CHAT STATE'LERİ
+  const [activeChat, setActiveChat] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+  const messagesEndRef = useRef(null);
 
   const navigate = useNavigate(); // Yönlendirme için hook
 
@@ -112,6 +128,46 @@ function VolunteerDashboard() {
 
     return () => unsub();
   }, [uid]);
+
+  // 🔥 CHAT MESAJLARINI DİNLE
+  useEffect(() => {
+    if (!activeChat || !uid) return;
+
+    // Chat ID Formatı: chat_{companyId}_{volunteerId}
+    // Gönüllü tarafında olduğumuz için activeChat.companyId ve kendi uid'miz (volunteerId)
+    const chatId = `chat_${activeChat.companyId}_${uid}`;
+
+    const q = query(
+      collection(db, "chats", chatId, "messages"),
+      orderBy("createdAt", "asc")
+    );
+
+    const unsub = onSnapshot(q, (snap) => {
+      setMessages(snap.docs.map(d => d.data()));
+      // Otomatik aşağı kaydır
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    });
+
+    return () => unsub();
+  }, [activeChat, uid]);
+
+  // 🔥 MESAJ GÖNDER
+  const sendMessage = async () => {
+    if (!newMessage.trim() || !activeChat || !uid) return;
+
+    const chatId = `chat_${activeChat.companyId}_${uid}`;
+
+    await addDoc(collection(db, "chats", chatId, "messages"), {
+      text: newMessage,
+      senderId: uid,
+      senderType: "volunteer", // Gönderen Gönüllü
+      createdAt: Date.now()
+    });
+
+    setNewMessage("");
+  };
 
   /* 🔥 Kullanıcının hangi ilanlara başvurduğu */
   const appliedIds = applications.map((a) => a.jobId);
@@ -253,13 +309,60 @@ function VolunteerDashboard() {
             {applications.length === 0 && <p>Henüz başvurun yok.</p>}
 
             {applications.map((item) => (
-              <div key={item.id} style={{ marginBottom: "10px" }}>
-                <strong>{item.jobTitle}</strong>
+              <div key={item.id} style={{ marginBottom: "10px", borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                    <strong>{item.jobTitle}</strong>
+                    
+                    {/* 🔥 CHAT BUTONU */}
+                    <IconChatButton onClick={() => setActiveChat(item)} title="Firma ile Sohbet Et">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                         <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM20 16H6L4 18V4H20V16Z"/>
+                      </svg>
+                    </IconChatButton>
+                </div>
                 <p>{item.companyName}</p>
               </div>
             ))}
           </ProfileCard>
         )}
+
+        {/* 🔥 CHAT PENCERESİ */}
+        {activeChat && (
+          <ChatWindowContainer>
+            <ChatHeader>
+              <span>{activeChat.companyName} ile Sohbet</span>
+              <CloseChatButton onClick={() => setActiveChat(null)}>✕</CloseChatButton>
+            </ChatHeader>
+
+            <ChatMessages>
+              {messages.map((msg, idx) => {
+                const isMe = msg.senderId === uid;
+                return (
+                  <MessageBubble key={idx} isMe={isMe}>
+                    {msg.text}
+                  </MessageBubble>
+                );
+              })}
+              <div ref={messagesEndRef} />
+            </ChatMessages>
+
+            <ChatInputArea>
+              <ChatInput 
+                placeholder="Mesaj yaz..." 
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+              />
+              <ChatSendButton onClick={sendMessage}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </ChatSendButton>
+            </ChatInputArea>
+          </ChatWindowContainer>
+        )}
+
       </Content>
 
       {/* 🔵 MODAL */}
