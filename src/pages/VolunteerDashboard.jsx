@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+// useNavigate import edildi
+import { useNavigate } from "react-router-dom"; 
 import {
   DashboardContainer,
   Sidebar,
@@ -13,6 +15,7 @@ import {
   JobButton,
   ModalOverlay,
   ModalBox,
+  LogoutItem, // 🔥 Yeni eklenen stil
 } from "../styles/VolunteerDashboardStyles.js";
 
 import { db, auth } from "../firebase";
@@ -24,7 +27,8 @@ import {
   onSnapshot,
   addDoc,
 } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
+// signOut import edildi
+import { onAuthStateChanged, signOut } from "firebase/auth"; 
 
 const SECTORS = [
   "Market / Perakende",
@@ -59,6 +63,8 @@ function VolunteerDashboard() {
   const [phone, setPhone] = useState("");
   const [note, setNote] = useState("");
 
+  const navigate = useNavigate(); // Yönlendirme için hook
+
   /* 🔥 GİRİŞ YAPAN KULLANICININ UID'SİNİ AL */
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
@@ -68,6 +74,16 @@ function VolunteerDashboard() {
     });
     return () => unsub();
   }, []);
+
+  /* 🔥 ÇIKIŞ YAP FONKSİYONU */
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/volunteer-login"); // Giriş sayfasına yönlendir
+    } catch (error) {
+      console.error("Çıkış hatası:", error);
+    }
+  };
 
   /* 🔥 TÜM İLANLARI DİNLE (BAĞIMSIZ) */
   useEffect(() => {
@@ -148,6 +164,26 @@ function VolunteerDashboard() {
         <SidebarItem onClick={() => setActivePage("profile")}>Profilim</SidebarItem>
         <SidebarItem onClick={() => setActivePage("jobs")}>İlanlar</SidebarItem>
         <SidebarItem onClick={() => setActivePage("applications")}>Başvurularım</SidebarItem>
+        
+        {/* 🔥 YENİ EKLENEN ÇIKIŞ BUTONU */}
+        <LogoutItem onClick={handleLogout}>
+          <svg 
+            width="20" 
+            height="20" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+            style={{ marginRight: '10px' }}
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Çıkış Yap
+        </LogoutItem>
       </Sidebar>
 
       <Content>

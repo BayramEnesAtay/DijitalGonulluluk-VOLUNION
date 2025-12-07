@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+// useNavigate eklendi
+import { useNavigate } from "react-router-dom";
 import {
   DashboardContainer,
   Sidebar,
@@ -7,6 +9,7 @@ import {
   Card,
   JobList,
   JobCard,
+  LogoutItem, // 🔥 Stil dosyasından import edildi
 } from "../styles/CompanyDashboardStyles";
 
 import { db, auth } from "../firebase";
@@ -21,7 +24,8 @@ import {
   onSnapshot,
   updateDoc,
 } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
+// signOut eklendi
+import { onAuthStateChanged, signOut } from "firebase/auth";
 
 const SECTORS = [
   "Market / Perakende",
@@ -75,6 +79,8 @@ function CompanyDashboard() {
   const [myJobs, setMyJobs] = useState([]);
   const [applications, setApplications] = useState([]);
 
+  const navigate = useNavigate(); // Yönlendirme için hook
+
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
@@ -86,6 +92,16 @@ function CompanyDashboard() {
 
     return () => unsub();
   }, []);
+
+  // 🔥 ÇIKIŞ YAP FONKSİYONU
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/company-login"); // Firma giriş sayfasına yönlendir
+    } catch (error) {
+      console.error("Çıkış hatası:", error);
+    }
+  };
 
   // 🔥 İLAN OLUŞTURMA
   const handleCreateListing = async () => {
@@ -153,6 +169,26 @@ function CompanyDashboard() {
         <SidebarItem onClick={() => setActivePage("create")}>İlan Oluştur</SidebarItem>
         <SidebarItem onClick={() => setActivePage("myjobs")}>İlanlarım</SidebarItem>
         <SidebarItem onClick={() => setActivePage("applications")}>Başvurular</SidebarItem>
+
+        {/* 🔥 YENİ EKLENEN ÇIKIŞ BUTONU */}
+        <LogoutItem onClick={handleLogout}>
+          <svg 
+            width="20" 
+            height="20" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+            style={{ marginRight: '10px' }}
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Çıkış Yap
+        </LogoutItem>
       </Sidebar>
 
       <Content>

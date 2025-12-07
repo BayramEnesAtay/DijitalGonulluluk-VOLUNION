@@ -96,8 +96,9 @@ export const ActionButton = styled.button`
   padding: 0.8rem;          /* biraz küçültüldü */
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, #3aa8ff, #1f7be5);
+  background: linear-gradient(135deg, #3a559a, #1A244A);
   color: white;
+ 
   font-size: 1rem;          /* daha uyumlu */
   font-weight: 600;
   cursor: pointer;
@@ -105,10 +106,10 @@ export const ActionButton = styled.button`
 
   &:hover {
     transform: translateY(-5px) scale(1.04);
-    background: linear-gradient(135deg, #6ddcff, #3aa8ff);
-    box-shadow: 
-      0 0 12px rgba(109,220,255,0.8),
-      0 0 25px rgba(58,168,255,0.6);
+    background: linear-gradient(135deg, #4b6cb7, #263875);
+    box-shadow:
+      0 0 12px rgba(75, 108, 183, 0.7),
+      0 0 25px rgba(26, 36, 74, 0.5);
   }
 `;
 export const LoginRedirect = styled.div`
