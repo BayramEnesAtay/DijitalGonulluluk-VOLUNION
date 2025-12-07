@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 import {
+  PageContainer,
+  NavBar,
+  BrandText,
+  NavButton,
   SignUpContainer,
   SignUpHeading,
   FormWrapper,
@@ -123,154 +127,170 @@ function CompanySignUp() {
   };
 
   return (
-    <SignUpContainer>
-      <SignUpHeading>Firma Kayıt</SignUpHeading>
+    <PageContainer>
+      
+      <NavBar>
+        <BrandText>VOLUNION</BrandText>
+        <NavButton to="/">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Anasayfa
+        </NavButton>
+      </NavBar>
 
-      {/* --------------------- STEP 1 --------------------- */}
-      {step === 1 && (
-        <FormWrapper>
-          <FormGroup>
-            <label>Firma Adı</label>
-            <InputField value={form1.companyName} onChange={(e) =>
-              setForm1({ ...form1, companyName: e.target.value })
-            }/>
-            {errors.companyName && <ErrorText>{errors.companyName}</ErrorText>}
-          </FormGroup>
+      <SignUpContainer>
+        <SignUpHeading>Firma Kayıt</SignUpHeading>
 
-          <FormGroup>
-            <label>Adres</label>
-            <InputField value={form1.address} onChange={(e) =>
-              setForm1({ ...form1, address: e.target.value })
-            }/>
-            {errors.address && <ErrorText>{errors.address}</ErrorText>}
-          </FormGroup>
+        {/* --------------------- STEP 1 --------------------- */}
+        {step === 1 && (
+          <FormWrapper>
+            <FormGroup>
+              <label>Firma Adı</label>
+              <InputField value={form1.companyName} onChange={(e) =>
+                setForm1({ ...form1, companyName: e.target.value })
+              }/>
+              {errors.companyName && <ErrorText>{errors.companyName}</ErrorText>}
+            </FormGroup>
 
-          <FormGroup>
-            <label>Mahalle</label>
-            <InputField value={form1.neighborhood} onChange={(e) =>
-              setForm1({ ...form1, neighborhood: e.target.value })
-            }/>
-            {errors.neighborhood && <ErrorText>{errors.neighborhood}</ErrorText>}
-          </FormGroup>
+            <FormGroup>
+              <label>Adres</label>
+              <InputField value={form1.address} onChange={(e) =>
+                setForm1({ ...form1, address: e.target.value })
+              }/>
+              {errors.address && <ErrorText>{errors.address}</ErrorText>}
+            </FormGroup>
 
-          <FormGroup>
-            <label>İlçe</label>
-            <InputField value={form1.district} onChange={(e) =>
-              setForm1({ ...form1, district: e.target.value })
-            }/>
-            {errors.district && <ErrorText>{errors.district}</ErrorText>}
-          </FormGroup>
+            <FormGroup>
+              <label>Mahalle</label>
+              <InputField value={form1.neighborhood} onChange={(e) =>
+                setForm1({ ...form1, neighborhood: e.target.value })
+              }/>
+              {errors.neighborhood && <ErrorText>{errors.neighborhood}</ErrorText>}
+            </FormGroup>
 
-          <FormGroup>
-            <label>İl</label>
-            <SelectField value={form1.city} onChange={(e) =>
-              setForm1({ ...form1, city: e.target.value })
-            }>
-              <option value="">Seçiniz</option>
-              {cities.map((c, i) => (
-                <option key={i} value={c}>{c}</option>
-              ))}
-            </SelectField>
-            {errors.city && <ErrorText>{errors.city}</ErrorText>}
-          </FormGroup>
+            {/* 🔥 DEĞİŞİKLİK BURADA: gap: '25px' yapıldı. İl kutusu sağa yanaştı. */}
+            <div style={{ display: 'flex', gap: '25px' }}>
+              <FormGroup>
+                <label>İlçe</label>
+                <InputField value={form1.district} onChange={(e) =>
+                  setForm1({ ...form1, district: e.target.value })
+                }/>
+                {errors.district && <ErrorText>{errors.district}</ErrorText>}
+              </FormGroup>
 
-          <FormGroup>
-            <label>Telefon</label>
-            <InputField value={form1.phone} onChange={(e) =>
-              setForm1({ ...form1, phone: e.target.value })
-            }/>
-            {errors.phone && <ErrorText>{errors.phone}</ErrorText>}
-          </FormGroup>
+              <FormGroup>
+                <label>İl</label>
+                <SelectField value={form1.city} onChange={(e) =>
+                  setForm1({ ...form1, city: e.target.value })
+                }>
+                  <option value="">Seçiniz</option>
+                  {cities.map((c, i) => (
+                    <option key={i} value={c}>{c}</option>
+                  ))}
+                </SelectField>
+                {errors.city && <ErrorText>{errors.city}</ErrorText>}
+              </FormGroup>
+            </div>
 
-          <ActionButton onClick={handleNext1}>Devam Et</ActionButton>
-          <LoginRedirect>
-            Hesabınız var mı? <Link to="/company-login">Giriş Yap</Link>
-          </LoginRedirect>
-        </FormWrapper>
-      )}
+            <FormGroup>
+              <label>Telefon</label>
+              <InputField value={form1.phone} onChange={(e) =>
+                setForm1({ ...form1, phone: e.target.value })
+              }/>
+              {errors.phone && <ErrorText>{errors.phone}</ErrorText>}
+            </FormGroup>
 
-      {/* --------------------- STEP 2 --------------------- */}
-      {step === 2 && (
-        <FormWrapper>
-          <FormGroup>
-            <label>Firma Türü</label>
-            <SelectField value={form2.companyType} onChange={(e) =>
-              setForm2({ ...form2, companyType: e.target.value })
-            }>
-              <option value="">Seçiniz</option>
-              {companyTypes.map((t, i) => (
-                <option key={i} value={t}>{t}</option>
-              ))}
-            </SelectField>
-            {errors.companyType && <ErrorText>{errors.companyType}</ErrorText>}
-          </FormGroup>
+            <ActionButton onClick={handleNext1}>Devam Et</ActionButton>
+            <LoginRedirect>
+              Hesabınız var mı? <Link to="/company-login">Giriş Yap</Link>
+            </LoginRedirect>
+          </FormWrapper>
+        )}
 
-          <FormGroup>
-            <label>Vergi No</label>
-            <InputField value={form2.taxNumber} onChange={(e) =>
-              setForm2({ ...form2, taxNumber: e.target.value })
-            }/>
-            {errors.taxNumber && <ErrorText>{errors.taxNumber}</ErrorText>}
-          </FormGroup>
+        {/* --------------------- STEP 2 --------------------- */}
+        {step === 2 && (
+          <FormWrapper>
+            <FormGroup>
+              <label>Firma Türü</label>
+              <SelectField value={form2.companyType} onChange={(e) =>
+                setForm2({ ...form2, companyType: e.target.value })
+              }>
+                <option value="">Seçiniz</option>
+                {companyTypes.map((t, i) => (
+                  <option key={i} value={t}>{t}</option>
+                ))}
+              </SelectField>
+              {errors.companyType && <ErrorText>{errors.companyType}</ErrorText>}
+            </FormGroup>
 
-          <FormGroup>
-            <label>Vergi Dairesi</label>
-            <InputField value={form2.taxOffice} onChange={(e) =>
-              setForm2({ ...form2, taxOffice: e.target.value })
-            }/>
-            {errors.taxOffice && <ErrorText>{errors.taxOffice}</ErrorText>}
-          </FormGroup>
+            <FormGroup>
+              <label>Vergi No</label>
+              <InputField value={form2.taxNumber} onChange={(e) =>
+                setForm2({ ...form2, taxNumber: e.target.value })
+              }/>
+              {errors.taxNumber && <ErrorText>{errors.taxNumber}</ErrorText>}
+            </FormGroup>
 
-          <ActionButton onClick={handleNext2}>Devam Et</ActionButton>
-          <LoginRedirect>
-            Hesabınız var mı? <Link to="/company-login">Giriş Yap</Link>
-          </LoginRedirect>
-        </FormWrapper>
-      )}
+            <FormGroup>
+              <label>Vergi Dairesi</label>
+              <InputField value={form2.taxOffice} onChange={(e) =>
+                setForm2({ ...form2, taxOffice: e.target.value })
+              }/>
+              {errors.taxOffice && <ErrorText>{errors.taxOffice}</ErrorText>}
+            </FormGroup>
 
-      {/* --------------------- STEP 3 --------------------- */}
-      {step === 3 && (
-        <FormWrapper>
-          <FormGroup>
-            <label>Ad Soyad</label>
-            <InputField value={form3.fullname} onChange={(e) =>
-              setForm3({ ...form3, fullname: e.target.value })
-            }/>
-            {errors.fullname && <ErrorText>{errors.fullname}</ErrorText>}
-          </FormGroup>
+            <ActionButton onClick={handleNext2}>Devam Et</ActionButton>
+            <LoginRedirect>
+              Hesabınız var mı? <Link to="/company-login">Giriş Yap</Link>
+            </LoginRedirect>
+          </FormWrapper>
+        )}
 
-          <FormGroup>
-            <label>Telefon</label>
-            <InputField value={form3.phone} onChange={(e) =>
-              setForm3({ ...form3, phone: e.target.value })
-            }/>
-            {errors.phone && <ErrorText>{errors.phone}</ErrorText>}
-          </FormGroup>
+        {/* --------------------- STEP 3 --------------------- */}
+        {step === 3 && (
+          <FormWrapper>
+            <FormGroup>
+              <label>Yönetici Ad Soyad</label>
+              <InputField value={form3.fullname} onChange={(e) =>
+                setForm3({ ...form3, fullname: e.target.value })
+              }/>
+              {errors.fullname && <ErrorText>{errors.fullname}</ErrorText>}
+            </FormGroup>
 
-          <FormGroup>
-            <label>E-Posta</label>
-            <InputField value={form3.email} onChange={(e) =>
-              setForm3({ ...form3, email: e.target.value })
-            }/>
-            {errors.email && <ErrorText>{errors.email}</ErrorText>}
-          </FormGroup>
+            <FormGroup>
+              <label>Yönetici Telefon</label>
+              <InputField value={form3.phone} onChange={(e) =>
+                setForm3({ ...form3, phone: e.target.value })
+              }/>
+              {errors.phone && <ErrorText>{errors.phone}</ErrorText>}
+            </FormGroup>
 
-          <FormGroup>
-            <label>Parola</label>
-            <InputField type="password" value={form3.password} onChange={(e) =>
-              setForm3({ ...form3, password: e.target.value })
-            }/>
-            {errors.password && <ErrorText>{errors.password}</ErrorText>}
-          </FormGroup>
+            <FormGroup>
+              <label>E-Posta</label>
+              <InputField value={form3.email} onChange={(e) =>
+                setForm3({ ...form3, email: e.target.value })
+              }/>
+              {errors.email && <ErrorText>{errors.email}</ErrorText>}
+            </FormGroup>
 
-          <ActionButton onClick={handleSubmit}>Hesap Oluştur</ActionButton>
+            <FormGroup>
+              <label>Parola</label>
+              <InputField type="password" value={form3.password} onChange={(e) =>
+                setForm3({ ...form3, password: e.target.value })
+              }/>
+              {errors.password && <ErrorText>{errors.password}</ErrorText>}
+            </FormGroup>
 
-          <LoginRedirect>
-            Hesabınız var mı? <Link to="/company-login">Giriş Yap</Link>
-          </LoginRedirect>
-        </FormWrapper>
-      )}
-    </SignUpContainer>
+            <ActionButton onClick={handleSubmit}>Hesap Oluştur</ActionButton>
+
+            <LoginRedirect>
+              Hesabınız var mı? <Link to="/company-login">Giriş Yap</Link>
+            </LoginRedirect>
+          </FormWrapper>
+        )}
+      </SignUpContainer>
+    </PageContainer>
   );
 }
 

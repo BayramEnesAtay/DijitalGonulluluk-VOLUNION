@@ -1,7 +1,7 @@
-// src/styles/ValuenterryLogIn.js
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 
-/* Form içeriğini ortalayan wrapper */
+/* Form içeriğini ortalayan wrapper (Kart içi düzen için) */
 export const FormWrapper = styled.div`
   width: 100%;
   text-align: center;
@@ -14,12 +14,12 @@ export const LoginContainer = styled.div`
 
   padding: 2.2rem 2rem;
 
-  /* 🔥 Kart Rengi: Biraz daha açıldı, daha cam gibi (Glassmorphism) */
   background: rgba(40, 55, 100, 0.35); 
-  border: 1px solid rgba(100, 120, 180, 0.3); /* Çerçeve daha belirgin ve açık */
+  border: 1px solid rgba(100, 120, 180, 0.3);
   backdrop-filter: blur(15px);
 
   border-radius: 20px;
+  /* Margin auto yerine FullPageWrapper ile ortalıyoruz, ama mobilde garanti olsun diye kalsın */
   margin: 0 auto;
   color: white;
 
@@ -28,6 +28,7 @@ export const LoginContainer = styled.div`
   align-items: center;
 
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+  z-index: 5; /* Navbarın altında kalmasın ama arka planın üstünde olsun */
 `;
 
 /* Başlık */
@@ -36,7 +37,6 @@ export const LoginHeading = styled.h2`
   font-weight: 700;
   margin-bottom: 1.8rem;
   text-align: center;
-  /* Glow efekti biraz daha maviye çekildi */
   text-shadow: 0 0 15px rgba(60, 80, 160, 0.5);
 `;
 
@@ -61,14 +61,12 @@ export const InputField = styled.input`
   padding: 0.85rem;
   border-radius: 10px;
 
-  /* 🔥 Inputlar: Daha açık, temiz bir lacivert zemin */
   border: 1px solid rgba(120, 140, 200, 0.4);
   background: rgba(40, 55, 100, 0.25);
   color: white;
   outline: none;
 
   &:focus {
-    /* Focus olunca canlı bir lacivert */
     border-color: #4b6cb7;
     box-shadow: 0 0 12px rgba(75, 108, 183, 0.6);
   }
@@ -88,7 +86,6 @@ export const SubmitButton = styled.button`
   border: none;
   border-radius: 10px;
 
-  /* 🔥 Buton: Siyahımsı lacivertten, daha 'Royal' ve canlı bir degradeye geçildi */
   background: linear-gradient(135deg, #3a559a, #1A244A);
   color: white;
 
@@ -100,7 +97,6 @@ export const SubmitButton = styled.button`
 
   &:hover {
     transform: translateY(-5px) scale(1.03);
-    /* Hoverda daha parlak */
     background: linear-gradient(135deg, #4b6cb7, #263875);
     box-shadow:
       0 0 12px rgba(75, 108, 183, 0.7),
@@ -130,7 +126,6 @@ export const AltButton = styled.button`
   padding: 0.6rem 1.8rem;
   border-radius: 10px;
 
-  /* Daha yumuşak kenarlıklar */
   border: 1px solid rgba(120, 140, 200, 0.4);
   background: rgba(40, 55, 100, 0.2);
   color: white;
@@ -155,7 +150,6 @@ export const SignUpText = styled.div`
   opacity: 0.9;
 
   a {
-    /* Link rengi: Koyu lacivert yerine daha okunabilir, parlak mavi */
     color: #6a89cc;
     margin-left: 5px;
     text-decoration: underline;
@@ -163,5 +157,72 @@ export const SignUpText = styled.div`
     &:hover {
         color: #82ccdd;
     }
+  }
+`;
+
+/* 🔥🔥🔥 YENİ EKLENEN HEADER VE WRAPPER STİLLERİ 🔥🔥🔥 */
+
+/* Sayfanın tamamını kaplayan kapsayıcı (Arka plan burada) */
+export const FullPageWrapper = styled.div`
+  width: 100%;
+  min-height: 100vh;
+  position: relative; /* Navbar için referans */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Landing page ile uyumlu arka plan */
+  background: radial-gradient(circle at top left, #1B254B, #111C44);
+  overflow: hidden;
+`;
+
+/* Sol üst köşedeki Navbar */
+export const NavBar = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 30px 40px;
+  display: flex;
+  align-items: center;
+  gap: 30px; /* Logo ve buton arası boşluk */
+  z-index: 10;
+  
+  @media (max-width: 768px) {
+    padding: 20px;
+    justify-content: space-between;
+  }
+`;
+
+/* Marka İsmi (Logo) */
+export const BrandText = styled.div`
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  background: linear-gradient(to right, #fff, #A3AED0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  cursor: default;
+`;
+
+/* Anasayfa Butonu */
+export const NavButton = styled(Link)`
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+
+  &:hover {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border-color: rgba(255,255,255,0.3);
+    transform: translateY(-2px);
   }
 `;
