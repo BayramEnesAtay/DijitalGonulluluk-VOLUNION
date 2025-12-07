@@ -1,17 +1,32 @@
 import styled, { keyframes } from "styled-components";
 
-// --- ORTAK TEMA (Firma Tarafıyla Aynı) ---
+// --- PROFESYONEL VE ZARİF TASARIM ---
 const theme = {
-  bg: "#F4F7FE",
-  sidebarBg: "#111C44",
-  cardBg: "#FFFFFF",
+  bg: "#0b1437", // Koyu modern arka plan
+  sidebarBg: "rgba(255, 255, 255, 0.05)", // Glassmorphism Sidebar
+  cardBg: "rgba(30, 42, 83, 0.7)", // Glassmorphism Card
   primary: "#4318FF",
   primaryHover: "#2B00D6",
-  textMain: "#2B3674",
+  textMain: "#FFFFFF",
   textLight: "#A3AED0",
-  border: "#E0E5F2",
-  overlay: "rgba(0, 0, 0, 0.4)"
+  border: "rgba(255, 255, 255, 0.1)",
+  danger: "#EE5D50",
+  success: "#05CD99",
+  overlay: "rgba(0, 0, 0, 0.6)"
 };
+
+// --- ANİMASYONLAR ---
+const float = keyframes`
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+`;
+
+const fadeInUp = keyframes`
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
 
 /* 1. ANA KAPSAYICI */
 export const DashboardContainer = styled.div`
@@ -25,16 +40,46 @@ export const DashboardContainer = styled.div`
   background-color: ${theme.bg};
   font-family: 'DM Sans', 'Inter', sans-serif;
   overflow: hidden;
+  position: relative;
+  z-index: 1;
+
+  /* Hareketli Arka Plan Işıkları */
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.3;
+    z-index: -1;
+    animation: ${float} 12s infinite ease-in-out alternate;
+  }
+
+  &::before {
+    background: ${theme.primary};
+    top: -150px;
+    left: -150px;
+  }
+
+  &::after {
+    background: #00D9F5;
+    bottom: -150px;
+    right: -150px;
+    animation-delay: -6s;
+  }
 
   @media (max-width: 768px) {
     flex-direction: column;
   }
 `;
 
-/* 2. SIDEBAR (Mobil Uyumlu) */
+/* 2. SIDEBAR */
 export const Sidebar = styled.div`
   width: 270px;
   background: ${theme.sidebarBg};
+  backdrop-filter: blur(20px);
+  border-right: 1px solid ${theme.border};
   color: white;
   display: flex;
   flex-direction: column;
@@ -54,7 +99,10 @@ export const Sidebar = styled.div`
     align-items: center;
     padding: 0 10px;
     border-radius: 20px 20px 0 0;
-    box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+    background: rgba(11, 20, 55, 0.95);
+    border-top: 1px solid ${theme.border};
+    border-right: none;
   }
 `;
 
@@ -73,6 +121,7 @@ export const SidebarItem = styled.div`
     background: rgba(255, 255, 255, 0.1);
     color: white;
     padding-left: 25px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   }
 
   @media (max-width: 768px) {
@@ -86,25 +135,26 @@ export const SidebarItem = styled.div`
       background: transparent;
       color: ${theme.primary};
       padding-left: 5px;
+      box-shadow: none;
     }
   }
 `;
 
-/* 🔥 YENİ EKLENEN: Çıkış Butonu Stili */
+/* Çıkış Butonu Stili */
 export const LogoutItem = styled(SidebarItem)`
-  margin-top: auto; /* En alta iter */
-  color: #FF5B5B;   /* Hafif kırmızı ton */
-  border: 1px solid rgba(255, 91, 91, 0.1);
+  margin-top: auto; 
+  color: ${theme.danger}; 
+  border: 1px solid rgba(238, 93, 80, 0.2);
 
   &:hover {
-    background: rgba(255, 91, 91, 0.15);
+    background: rgba(238, 93, 80, 0.15);
     color: #FF8080;
-    padding-left: 20px; /* Diğerleri kadar kaymasın */
-    border-color: rgba(255, 91, 91, 0.3);
+    padding-left: 20px;
+    border-color: rgba(238, 93, 80, 0.5);
   }
 
   @media (max-width: 768px) {
-    margin-top: 0; /* Mobilde alta itme iptal (yan yana dizilim) */
+    margin-top: 0;
     border: none;
     
     &:hover {
@@ -116,19 +166,19 @@ export const LogoutItem = styled(SidebarItem)`
 /* 3. İÇERİK ALANI */
 export const Content = styled.div`
   flex: 1;
-  background: ${theme.bg};
-  padding: 20px;
+  /* Background ana container'dan geliyor */
+  padding: 30px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  align-items: center; /* İçeriği ortala */
+  align-items: center;
 
   scrollbar-width: thin;
   &::-webkit-scrollbar {
     width: 8px;
   }
   &::-webkit-scrollbar-thumb {
-    background-color: #C4CEDB;
+    background-color: rgba(255,255,255,0.2);
     border-radius: 10px;
   }
 
@@ -141,12 +191,16 @@ export const Content = styled.div`
 /* 4. PROFİL & LİSTE KARTI (Card Bileşeniyle Aynı Mantık) */
 export const ProfileCard = styled.div`
   background: ${theme.cardBg};
+  backdrop-filter: blur(20px);
   border-radius: 20px;
   padding: 35px;
   width: 100%;
+  max-width: 100%;
   margin-bottom: 25px;
-  border: 1px solid rgba(255,255,255,0.6);
-  box-shadow: 0 5px 30px rgba(0,0,0,0.03);
+  border: 1px solid ${theme.border};
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  animation: ${fadeInUp} 0.5s ease-out;
+  color: white;
 
   display: flex;
   flex-direction: column;
@@ -179,16 +233,17 @@ export const SearchBar = styled.input`
   padding: 16px 20px;
   border-radius: 16px;
   border: 1px solid ${theme.border};
-  background: white;
+  background: rgba(0, 0, 0, 0.2);
   margin-bottom: 20px;
   font-size: 15px;
-  color: ${theme.textMain};
+  color: white;
   outline: none;
-  transition: all 0.2s;
+  transition: all 0.3s;
 
   &:focus {
     border-color: ${theme.primary};
-    box-shadow: 0 0 0 4px rgba(67, 24, 255, 0.08);
+    box-shadow: 0 0 0 4px rgba(67, 24, 255, 0.2);
+    background: rgba(0, 0, 0, 0.4);
   }
 `;
 
@@ -202,17 +257,23 @@ export const FilterContainer = styled.div`
 
 export const SelectBox = styled.select`
   padding: 14px 20px;
-  background: white;
+  background: rgba(0, 0, 0, 0.2);
   border-radius: 14px;
   border: 1px solid ${theme.border};
   cursor: pointer;
-  color: ${theme.textMain};
+  color: white;
   font-size: 14px;
   min-width: 180px;
   outline: none;
   
   &:focus {
     border-color: ${theme.primary};
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  option {
+    background: #0b1437;
+    color: white;
   }
 `;
 
@@ -225,14 +286,15 @@ export const JobList = styled.div`
 `;
 
 export const JobCard = styled.div`
-  background: white;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
   border: 1px solid ${theme.border};
   border-radius: 16px;
   padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  transition: all 0.25s ease;
+  transition: all 0.3s ease;
   position: relative;
   
   h3 {
@@ -251,15 +313,16 @@ export const JobCard = styled.div`
   &:hover {
     border-color: ${theme.primary};
     transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.06);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+    background: rgba(255, 255, 255, 0.08);
   }
 `;
 
 /* 7. BUTONLAR */
 export const JobButton = styled.button`
-  margin-top: auto; /* Kartın en altına it */
+  margin-top: auto; 
   padding: 12px 20px;
-  background: ${(p) => (p.disabled ? "#E0E5F2" : theme.primary)};
+  background: ${(p) => (p.disabled ? "rgba(255,255,255,0.1)" : `linear-gradient(135deg, ${theme.primary} 0%, #2B3674 100%)`)};
   color: ${(p) => (p.disabled ? "#A3AED0" : "white")};
   border-radius: 12px;
   border: none;
@@ -270,9 +333,9 @@ export const JobButton = styled.button`
   width: 100%;
 
   &:hover {
-    background: ${(p) => (p.disabled ? "#E0E5F2" : theme.primaryHover)};
+    background: ${(p) => (p.disabled ? "rgba(255,255,255,0.1)" : `linear-gradient(135deg, #5833FF 0%, #3B4B96 100%)`)};
     transform: ${(p) => (p.disabled ? "none" : "translateY(-2px)")};
-    box-shadow: ${(p) => (p.disabled ? "none" : "0 5px 15px rgba(67, 24, 255, 0.2)")};
+    box-shadow: ${(p) => (p.disabled ? "none" : "0 5px 15px rgba(67, 24, 255, 0.4)")};
   }
 `;
 
@@ -283,8 +346,8 @@ export const ModalOverlay = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(17, 28, 68, 0.4); /* Hafif koyu perde */
-  backdrop-filter: blur(4px); /* Buzlu cam efekti */
+  background: rgba(0, 0, 0, 0.8); 
+  backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -293,7 +356,7 @@ export const ModalOverlay = styled.div`
 `;
 
 export const ModalBox = styled.div`
-  background: white;
+  background: linear-gradient(145deg, #111C44, #1B254B);
   padding: 30px;
   width: 100%;
   max-width: 500px;
@@ -301,13 +364,9 @@ export const ModalBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 15px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-  animation: fadeIn 0.3s ease;
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-  }
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: ${fadeInUp} 0.3s ease;
+  border: 1px solid rgba(255,255,255,0.1);
 
   h3 {
     margin: 0 0 10px 0;
@@ -321,8 +380,8 @@ export const ModalBox = styled.div`
     padding: 14px 18px;
     border-radius: 12px;
     border: 1px solid ${theme.border};
-    background: #F9F9FC;
-    color: ${theme.textMain};
+    background: rgba(0,0,0,0.3);
+    color: white;
     font-family: inherit;
     font-size: 14px;
     width: 100%;
@@ -331,7 +390,7 @@ export const ModalBox = styled.div`
 
     &:focus {
       border-color: ${theme.primary};
-      background: white;
+      background: rgba(0,0,0,0.5);
     }
   }
 
@@ -357,8 +416,8 @@ export const ModalBox = styled.div`
       border: 1px solid ${theme.border};
       
       &:hover {
-        background: #F4F7FE;
-        color: ${theme.textMain};
+        background: rgba(255,255,255,0.05);
+        color: white;
       }
     }
   }
@@ -367,11 +426,6 @@ export const ModalBox = styled.div`
 /* =========================================
    🔥 CHAT CSS (Styled Components) 
    ========================================= */
-
-const fadeIn = keyframes`
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-`;
 
 const slideIn = keyframes`
   from { transform: translateY(8px); opacity: 0; }
@@ -391,7 +445,7 @@ export const ChatWindowContainer = styled.div`
   flex-direction: column;
   box-shadow: 0 10px 35px rgba(0,0,0,0.25);
   overflow: hidden;
-  animation: ${fadeIn} 0.25s ease;
+  animation: ${fadeInUp} 0.25s ease;
   z-index: 999999;
   border: 1px solid ${theme.border};
 `;

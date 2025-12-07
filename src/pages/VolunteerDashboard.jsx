@@ -191,7 +191,7 @@ function VolunteerDashboard() {
       createdAt: Date.now(),
     });
 
-    alert("Başvuru gönderildi!");
+    
 
     setShowModal(false);
     setFullname("");

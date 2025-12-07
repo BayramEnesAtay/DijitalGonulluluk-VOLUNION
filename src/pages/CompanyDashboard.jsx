@@ -130,6 +130,9 @@ function CompanyDashboard() {
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef(null);
 
+  // 🔥 YENİ: Başvuru notlarını açıp kapatmak için state
+  const [expandedApps, setExpandedApps] = useState({});
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -207,7 +210,7 @@ function CompanyDashboard() {
       createdAt: Date.now(),
     });
     setTitle(""); setDesc(""); setLocation(""); setSector("");
-    alert("İlan yayınlandı!");
+    
   };
 
   const acceptApplication = async (app) => {
@@ -244,9 +247,17 @@ function CompanyDashboard() {
       note,
       createdAt: Date.now(),
     });
-    alert("Başvuru gönderildi!");
+    
     setShowModal(false);
     setFullname(""); setPhone(""); setNote("");
+  };
+
+  // 🔥 Not gösterme fonksiyonu
+  const toggleNote = (appId) => {
+    setExpandedApps(prev => ({
+        ...prev,
+        [appId]: !prev[appId] // Varsa kapat, yoksa aç
+    }));
   };
 
   const filteredAllJobs = allJobs
@@ -346,7 +357,7 @@ function CompanyDashboard() {
                 <div key={app.id} style={{ padding: "14px", borderBottom: "1px solid #ddd" }}>
                   <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                     <h4>{app.jobTitle}</h4>
-                    {/* 🔥 CHAT: Ben firmayım, karşı taraf (app.volunteerId) gönüllü */}
+                    {/* CHAT: Ben firmayım, karşı taraf (app.volunteerId) gönüllü */}
                     <IconChatButton onClick={() => setActiveChat({
                         ...app,
                         chatId: `chat_${currentUser.uid}_${app.volunteerId}`
@@ -358,6 +369,40 @@ function CompanyDashboard() {
                   </div>
                   <p><b>Başvuran:</b> {app.fullname}</p>
                   <p><b>Telefon:</b> {app.phone}</p>
+
+                  {/* 🔥 YENİ: NOT GÖSTERME ALANI */}
+                  {app.note && (
+                    <div style={{ margin: '10px 0' }}>
+                        <span 
+                            onClick={() => toggleNote(app.id)}
+                            style={{ 
+                                color: '#4318FF', 
+                                cursor: 'pointer', 
+                                fontWeight: '600',
+                                fontSize: '0.9rem',
+                                textDecoration: 'underline'
+                            }}
+                        >
+                            {expandedApps[app.id] ? "Gönüllü Notunu Gizle" : "Gönüllü Notunu Göster"}
+                        </span>
+                        
+                        {expandedApps[app.id] && (
+                            <div style={{
+                                marginTop: '8px',
+                                padding: '12px',
+                                backgroundColor: '#F4F7FE',
+                                borderRadius: '10px',
+                                border: '1px solid #E0E5F2',
+                                color: '#2B3674',
+                                fontSize: '0.9rem',
+                                lineHeight: '1.5'
+                            }}>
+                                <i>"{app.note}"</i>
+                            </div>
+                        )}
+                    </div>
+                  )}
+
                   {jobIsLocked && job.acceptedVolunteerId !== app.volunteerId ? (
                     <p style={{ color: "red" }}>Bu ilan için başka biri kabul edildi.</p>
                   ) : (
@@ -433,7 +478,7 @@ function CompanyDashboard() {
               <div key={item.id} style={{ marginBottom: "10px", borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
                 <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                     <strong>{item.jobTitle}</strong>
-                    {/* 🔥 DÜZELTME: Karşı tarafın ismi (Company Name) Chat başlığında çıksın diye fullname override edildi */}
+                    {/* 🔥 CHAT: Karşı taraf firma (item.companyId), ben gönüllü rolündeyim (currentUser.uid) */}
                     <IconChatButton onClick={() => setActiveChat({
                         ...item, 
                         chatId: `chat_${item.companyId}_${currentUser.uid}`,
