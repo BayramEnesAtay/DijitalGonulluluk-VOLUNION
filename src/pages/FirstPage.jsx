@@ -16,7 +16,7 @@ function LandingPage() {
     <PageWrapper>
       
       {/* Navbar Yok - Başlık Birleştirildi */}
-      <Heading>VONUION'A HOŞ GELDİNİZ</Heading>
+      <Heading>VOLUNION'A HOŞ GELDİNİZ</Heading>
       
       <SubHeading>
         Devam etmek için lütfen giriş türünüzü seçiniz.
@@ -68,7 +68,7 @@ function LandingPage() {
         </FooterLinks>
 
         <FooterMission>
-          &copy; 2025 VONUION. <br/>
+          &copy; 2025 VOLUNION. <br/>
           Toplumsal dayanışmayı dijitalleştiren, güvenilir gönüllülük platformu.
         </FooterMission>
       </FooterWrapper>

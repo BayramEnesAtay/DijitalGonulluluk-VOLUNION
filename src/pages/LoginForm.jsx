@@ -56,7 +56,7 @@ function LoginForm({ title, signupLink }) {
       
       {/* 🔥 SOL ÜST KÖŞE: LOGO VE ANASAYFA BUTONU */}
       <NavBar>
-        <BrandText>VONUION</BrandText>
+        <BrandText>VOLUNION</BrandText>
         
         <NavButton to="/">
           {/* Geri Dönüş İkonu (SVG) */}

@@ -95,7 +95,7 @@ function VolunteerDashboard() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigate("/volunteer-login"); // Giriş sayfasına yönlendir
+      navigate("/"); // Giriş sayfasına yönlendir
     } catch (error) {
       console.error("Çıkış hatası:", error);
     }
