@@ -1,26 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   LoginContainer,
   LoginHeading,
   FormGroup,
   InputField,
   SubmitButton,
-  FormWrapper, // Form içindeki düzen için kullanılan mevcut wrapper
+  FormWrapper,
   SignUpText,
-  // 🔥 YENİ EKLENENLER:
   FullPageWrapper,
   NavBar,
   BrandText,
-  NavButton
+  NavButton,
+  RememberMeWrapper,
+  RememberLabel
 } from "../styles/ValuenterryLogIn.js";
 import { Link, useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence, browserSessionPersistence } from "firebase/auth";
 import { auth } from "../firebase";
 
 function LoginForm({ title, signupLink }) {
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [error, setError] = React.useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
 
   const navigate = useNavigate();
 
@@ -29,6 +31,9 @@ function LoginForm({ title, signupLink }) {
     setError("");
 
     try {
+      const persistenceType = rememberMe ? browserLocalPersistence : browserSessionPersistence;
+      await setPersistence(auth, persistenceType);
+
       await signInWithEmailAndPassword(auth, email, password);
 
       if (title === "Gönüllü Girişi") {
@@ -51,15 +56,11 @@ function LoginForm({ title, signupLink }) {
   };
 
   return (
-    /* 🔥 Sayfa Arka Planı ve Düzeni */
     <FullPageWrapper>
       
-      {/* 🔥 SOL ÜST KÖŞE: LOGO VE ANASAYFA BUTONU */}
       <NavBar>
         <BrandText>VOLUNION</BrandText>
-        
         <NavButton to="/">
-          {/* Geri Dönüş İkonu (SVG) */}
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5M12 19l-7-7 7-7"/>
           </svg>
@@ -67,7 +68,6 @@ function LoginForm({ title, signupLink }) {
         </NavButton>
       </NavBar>
 
-      {/* Mevcut Login Kartı */}
       <LoginContainer>
         <LoginHeading>{title}</LoginHeading>
 
@@ -76,7 +76,10 @@ function LoginForm({ title, signupLink }) {
             <FormGroup>
               <label>E-Mail</label>
               <InputField
+                id="email" // 🔥 Eklendi: Tarayıcının alanı tanıması için
                 type="email"
+                name="email"
+                autoComplete="username" // Şifreyle eşleşmesi için 'username' olarak kalmalı
                 placeholder="E-posta adresinizi giriniz"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -87,13 +90,27 @@ function LoginForm({ title, signupLink }) {
             <FormGroup>
               <label>Şifre</label>
               <InputField
+                id="password" // 🔥 Eklendi: Tarayıcının şifre alanı olduğunu anlaması için
                 type="password"
+                name="password"
+                autoComplete="current-password" // Şifrenin otomatik dolmasını sağlar
                 placeholder="Şifrenizi giriniz"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </FormGroup>
+
+            <RememberMeWrapper>
+              <input 
+                type="checkbox" 
+                id="rememberMe" 
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                style={{ cursor: "pointer", width: "16px", height: "16px" }}
+              />
+              <RememberLabel htmlFor="rememberMe">Beni Hatırla</RememberLabel>
+            </RememberMeWrapper>
 
             {error && (
               <p style={{ color: "#ff6b6b", marginTop: "5px", fontSize: "0.9rem", textAlign: 'left' }}>

@@ -1,34 +1,28 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
-/* Form içeriğini ortalayan wrapper (Kart içi düzen için) */
+/* Form içeriğini ortalayan wrapper */
 export const FormWrapper = styled.div`
   width: 100%;
   text-align: center;
 `;
 
-/* Login kutusu (ortada duran kart) */
+/* Login kutusu */
 export const LoginContainer = styled.div`
   width: 100%;
   max-width: 430px;
-
   padding: 2.2rem 2rem;
-
   background: rgba(40, 55, 100, 0.35); 
   border: 1px solid rgba(100, 120, 180, 0.3);
   backdrop-filter: blur(15px);
-
   border-radius: 20px;
-  /* Margin auto yerine FullPageWrapper ile ortalıyoruz, ama mobilde garanti olsun diye kalsın */
   margin: 0 auto;
   color: white;
-
   display: flex;
   flex-direction: column;
   align-items: center;
-
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
-  z-index: 5; /* Navbarın altında kalmasın ama arka planın üstünde olsun */
+  z-index: 5;
 `;
 
 /* Başlık */
@@ -60,7 +54,6 @@ export const InputField = styled.input`
   max-width: 360px;
   padding: 0.85rem;
   border-radius: 10px;
-
   border: 1px solid rgba(120, 140, 200, 0.4);
   background: rgba(40, 55, 100, 0.25);
   color: white;
@@ -82,25 +75,19 @@ export const SubmitButton = styled.button`
   max-width: 360px;
   margin-top: 1rem;
   padding: 0.85rem;
-
   border: none;
   border-radius: 10px;
-
   background: linear-gradient(135deg, #3a559a, #1A244A);
   color: white;
-
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
-
   transition: 0.35s ease;
 
   &:hover {
     transform: translateY(-5px) scale(1.03);
     background: linear-gradient(135deg, #4b6cb7, #263875);
-    box-shadow:
-      0 0 12px rgba(75, 108, 183, 0.7),
-      0 0 25px rgba(26, 36, 74, 0.5);
+    box-shadow: 0 0 12px rgba(75, 108, 183, 0.7), 0 0 25px rgba(26, 36, 74, 0.5);
   }
 `;
 
@@ -113,7 +100,7 @@ export const AltLogin = styled.div`
   color: white;
 `;
 
-/* Google butonu – ortalı */
+/* Google butonu */
 export const AltButtons = styled.div`
   margin-top: 0.75rem;
   width: 100%;
@@ -125,13 +112,11 @@ export const AltButtons = styled.div`
 export const AltButton = styled.button`
   padding: 0.6rem 1.8rem;
   border-radius: 10px;
-
   border: 1px solid rgba(120, 140, 200, 0.4);
   background: rgba(40, 55, 100, 0.2);
   color: white;
   font-size: 0.9rem;
   cursor: pointer;
-
   transition: 0.3s ease;
 
   &:hover {
@@ -141,7 +126,7 @@ export const AltButton = styled.button`
   }
 `;
 
-/* Hesap oluşturma metni – ortalı */
+/* Hesap oluşturma metni */
 export const SignUpText = styled.div`
   margin-top: 1.5rem;
   width: 100%;
@@ -153,29 +138,23 @@ export const SignUpText = styled.div`
     color: #6a89cc;
     margin-left: 5px;
     text-decoration: underline;
-    
-    &:hover {
-        color: #82ccdd;
-    }
+    &:hover { color: #82ccdd; }
   }
 `;
 
-/* 🔥🔥🔥 YENİ EKLENEN HEADER VE WRAPPER STİLLERİ 🔥🔥🔥 */
-
-/* Sayfanın tamamını kaplayan kapsayıcı (Arka plan burada) */
+/* Full Page Wrapper */
 export const FullPageWrapper = styled.div`
   width: 100%;
   min-height: 100vh;
-  position: relative; /* Navbar için referans */
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  /* Landing page ile uyumlu arka plan */
   background: radial-gradient(circle at top left, #1B254B, #111C44);
   overflow: hidden;
 `;
 
-/* Sol üst köşedeki Navbar */
+/* NavBar */
 export const NavBar = styled.div`
   position: absolute;
   top: 0;
@@ -184,7 +163,7 @@ export const NavBar = styled.div`
   padding: 30px 40px;
   display: flex;
   align-items: center;
-  gap: 30px; /* Logo ve buton arası boşluk */
+  gap: 30px;
   z-index: 10;
   
   @media (max-width: 768px) {
@@ -193,7 +172,7 @@ export const NavBar = styled.div`
   }
 `;
 
-/* Marka İsmi (Logo) */
+/* Logo */
 export const BrandText = styled.div`
   font-size: 1.8rem;
   font-weight: 800;
@@ -225,4 +204,22 @@ export const NavButton = styled(Link)`
     border-color: rgba(255,255,255,0.3);
     transform: translateY(-2px);
   }
+`;
+
+/* 🔥 YENİ EKLENENLER: Beni Hatırla Stilleri */
+export const RememberMeWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  gap: 8px;
+`;
+
+export const RememberLabel = styled.label`
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  user-select: none;
 `;

@@ -189,3 +189,71 @@ export const OptionLabel = styled.span`
   letter-spacing: 0.5px;
   margin-top: 10px;
 `;
+/* --- POP-UP (MODAL) STİLLERİ --- */
+/* (Bu kodları src/styles/FirstPage.js dosyasının EN ALTINA yapıştır) */
+
+export const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6); /* Arka planı karart */
+  backdrop-filter: blur(8px);     /* Arka planı bulanıklaştır */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* En üstte durması için */
+  animation: fadeIn 0.3s ease;
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+`;
+
+export const ModalContent = styled.div`
+  background: rgba(20, 30, 60, 0.95); /* Koyu Lacivert Zemin */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* İnce beyaz çerçeve */
+  padding: 40px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  text-align: left;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  color: #fff;
+  
+  h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    color: #4318FF; /* Tema Rengi */
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 10px;
+  }
+
+  p {
+    line-height: 1.6;
+    color: #A3AED0;
+    font-size: 1rem;
+    white-space: pre-line; /* Alt satıra geçişleri algıla */
+  }
+`;
+
+export const CloseButton = styled.button`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: #A3AED0;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: 0.2s;
+
+  &:hover {
+    color: #fff;
+    transform: scale(1.1);
+  }
+`;
